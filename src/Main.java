@@ -47,32 +47,34 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx.setColor(sprite);
         gfx.fillRect(sx, sy, 10, 10);
 
-
         //FINAL
         g.drawImage(img,0,0,this);
     }
 
+    public void update(Graphics g){ //REDRAWS FRAME
+        paint(g);
+    }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
             if (pressingW){
-                sy--;
-            }else if (pressingS){
-                sy++;
+                sy=sy-1;
+            }
+            if (pressingS){
+                sy=sy+1;
             }
             if (pressingA){
-                sx--;
-            }else if (pressingD){
-                sx++;
+                sx=sx-1;
+            }
+            if (pressingD){
+                sx=sx+1;
             }
 
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
-
-    public void update(Graphics g){ paint(g); }//REDRAWS FRAME
 
 
     //INPUT
