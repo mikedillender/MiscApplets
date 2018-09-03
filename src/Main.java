@@ -21,6 +21,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     //"CHARACTER"
     int sx=WIDTH/2;
     int sy=HEIGHT/2;
+    double velx;
+    double vely;
 
     //CONTROLS
     boolean pressingW;
@@ -45,7 +47,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         //RENDER FOREGROUND
         gfx.setColor(sprite);
-        gfx.fillRect(sx, sy, 10, 10);
+        gfx.fillRect(sx, sy, 20, 20);
 
         //FINAL
         g.drawImage(img,0,0,this);
@@ -57,23 +59,40 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
-            //UPDATES
-            if (pressingW){
-                sy=sy-1;
-            }
-            if (pressingS){
-                sy=sy+1;
-            }
-            if (pressingA){
-                sx=sx-1;
-            }
-            if (pressingD){
-                sx=sx+1;
-            }
+        //UPDATES
+        if (pressingW){
+            vely-=.2;
+        }
+        if (pressingA){
+            velx-=.1;
+        }
+        if (pressingD){
+            velx+=.1;
+        }
+        vely+=.1;
+        velx*=.97;
+        sx+=velx;
+        sy+=vely;
+        if (sx>WIDTH-20){
+            velx=0;
+            sx=WIDTH-20;
+        }
+        if (sx<0){
+            velx=0;
+            sx=0;
+        }
+        if (sy>HEIGHT-20){
+            sy=HEIGHT-20;
+            vely=0;
+        }
+        if (sy<0){
+            vely=0;
+            sy=0;
+        }
 
-            repaint();//UPDATES FRAME
-            try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
-            catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
+        repaint();//UPDATES FRAME
+        try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
+        catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
 
