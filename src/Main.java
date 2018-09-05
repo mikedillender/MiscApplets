@@ -30,6 +30,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     boolean pressingS;
     boolean pressingD;
 
+    Snake snake=new Snake(WIDTH/2,HEIGHT/2,WIDTH, HEIGHT);
+
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
@@ -37,6 +39,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+
     }
 
     public void paint(Graphics g){
@@ -48,6 +51,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         //RENDER FOREGROUND
         gfx.setColor(sprite);
         gfx.fillRect(sx, sy, 20, 20);
+        snake.render(gfx);
 
         //FINAL
         g.drawImage(img,0,0,this);
@@ -89,6 +93,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             vely=0;
             sy=0;
         }
+        snake.update(.015f);
 
         repaint();//UPDATES FRAME
         try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
