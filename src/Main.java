@@ -15,18 +15,9 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     //COLORS
     Color background=new Color(255, 255, 255);
-    Color sprite=new Color(0,0,0);
     Color gridColor=new Color(150, 150,150);
 
-    //"CHARACTER"
-    int sx=WIDTH/2;
-    int sy=HEIGHT/2;
 
-    //CONTROLS
-    boolean pressingW;
-    boolean pressingA;
-    boolean pressingS;
-    boolean pressingD;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -44,8 +35,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         paintCoordGrid(gfx);
 
         //RENDER FOREGROUND
-        gfx.setColor(sprite);
-        gfx.fillRect(sx, sy, 10, 10);
+
 
         //FINAL
         g.drawImage(img,0,0,this);
@@ -58,18 +48,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
-            if (pressingW){
-                sy=sy-1;
-            }
-            if (pressingS){
-                sy=sy+1;
-            }
-            if (pressingA){
-                sx=sx-1;
-            }
-            if (pressingD){
-                sx=sx+1;
-            }
+
 
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
@@ -78,20 +57,13 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     //INPUT
-    public void keyPressed(KeyEvent e) { updateControls(e, true); }
-    public void keyReleased(KeyEvent e) { updateControls(e, false); }
-    public void keyTyped(KeyEvent e) { }
-    public void updateControls(KeyEvent e, boolean pressed){
-        if (e.getKeyCode()==KeyEvent.VK_W){
-            pressingW=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_A){
-            pressingA=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_S){
-            pressingS=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_D){
-            pressingD=pressed;
-        }
+    public void keyPressed(KeyEvent e) {
+
     }
+    public void keyReleased(KeyEvent e) {
+
+    }
+    public void keyTyped(KeyEvent e) { }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
     public void paintCoordGrid(Graphics gfx){
