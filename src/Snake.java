@@ -13,6 +13,7 @@ public class Snake {
     float turnMagnitude=1;
     int BLOCKSIZE;
     float[][] spritePositions;
+    ArrayList<float[]> previousPos=new ArrayList<>();
 
     public Snake(float x, float y, int WIDTH, int HEIGHT){
         spritePositions=new float[10][];
@@ -21,6 +22,8 @@ public class Snake {
         }
         previousAngles.add(new float[]{0,0});
     }
+
+
 
     public void update(float delta){
         time+=delta;
@@ -32,6 +35,11 @@ public class Snake {
         float newAngle=previousAngles.get(0)[0]+delta*turnMagnitude;
         previousAngles.add(0, new float[]{newAngle, time});
         System.out.println("angle= "+(int)previousAngles.get(0)[0]);
+
+        movev1(delta);
+    }
+
+    private void movev1(float delta){
         for (int i=0; i<10; i++) {
             float cangle=getAngleTSecondsAgo((float) ((double) pxDistBetweenSprites / v) * i, i);
             System.out.println("for sprite "+i+" Angle is "+cangle);
@@ -62,8 +70,10 @@ public class Snake {
     }
 
     public void render(Graphics g) {
+        //Color color=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
+        //g.setColor(color);
         for (int i=0; i<10; i++){
-            g.drawRect((int)spritePositions[i][0], (int)spritePositions[i][1],  20, 20);
+            g.fillRect((int)spritePositions[i][0], (int)spritePositions[i][1],  20, 20);
         }
     }
 

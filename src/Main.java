@@ -42,9 +42,25 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     }
 
+    int[] color=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
+
+
     public void paint(Graphics g){
         //BACKGROUND
+
+        for (int i=0; i<3; i++){
+            color[i]=color[i]-2+(int)(Math.random()*5);
+            if (color[i]<0){
+                color[i]=0;
+            }else if (color[i]>255){
+                color[i]=255;
+            }
+        }
+
         gfx.setColor(background);//background
+        //Color color1=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
+        ///color1=new Color(color[0],color[1], color[2]);
+        //gfx.setColor(color1);
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
         paintCoordGrid(gfx);
 
