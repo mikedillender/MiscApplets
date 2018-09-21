@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1900, HEIGHT=900;
+    private final int WIDTH=400, HEIGHT=1500;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -17,11 +17,11 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color waterc=new Color(100,100,250);
     Color gridColor=new Color(150, 150,150);
-    int tilesize=5;
+    int tilesize=1;
 
     //"CHARACTER"
-    float[][] water;
-    boolean[][] map;
+    float[][] water=new float[WIDTH/tilesize][HEIGHT/tilesize];
+    boolean[][] map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
     boolean[][] inputMap;
 
     //CONTROLS
@@ -29,6 +29,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     boolean pressingA;
     boolean pressingS;
     boolean pressingD;
+    boolean[][] checked;
+
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -39,7 +41,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         thread.start();
         water=new float[WIDTH/tilesize][HEIGHT/tilesize];
         map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
-        int[][] m1=new int[][]{
+        /*int[][] m1=new int[][]{
                 {0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,1,1,1,0,0,0,0},
@@ -49,9 +51,12 @@ public class Main extends Applet implements Runnable, KeyListener {
                 {0,0,1,1,0,0,0,1,1,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0}
         };
-        intToBool(m1);
-        invertMap();
-        scaleMap(inputMap);
+        //intToBool(m1);
+        //invertMap();
+        //scaleMap(inputMap);
+        */
+        checked=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
+        createRunnableMaze();
     }
 
     private void intToBool(int[][] m1){
@@ -121,6 +126,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (int i=0; i<10; i++) {
             if (Math.random()<.06) {
                 water[(water.length / 2) - 5 + i][0] = 100;
+
             }
         }
         //water[(int)(Math.random()*water.length)][0]=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
@@ -143,7 +149,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     private void flowWater(int x, int y){
-        for (int dir=0; dir<3; dir++){
+        for (int dir=0; dir<4; dir++){
             if (water[x][y]<10){ return;}
             int x1=x;
             int y1=y;
@@ -208,6 +214,85 @@ public class Main extends Applet implements Runnable, KeyListener {
                     gfx.fillRect(x * tilesize, y * tilesize, tilesize, tilesize);
                 }
             }
+        }
+    }
+
+    public boolean canSolve(int x, int y, int reccount, int lastx, int lasty){
+        boolean exitFound=false;
+        checked[x][y]=true;
+        if (isEnd(x, y)){return true;}
+        for (int dir=0; dir<4; dir++){
+            int x1=x;
+            int y1=y;
+            switch (dir){
+                case 0:
+                    y1+=1;
+                    break;
+                case 1:
+                    x1+=1;
+                    break;
+                case 2:
+                    x1-=1;
+                    break;
+            }
+            if (isValidLoc(x1, y1)){
+                if (!checked[x1][y1]) {
+                    if (!map[x1][y1]) {
+                        //System.out.println("checking "+x+", "+y);
+                        if (canSolve(x1, y1, reccount+1, x, y )){
+                            System.out.println("CAN SOLVE");
+                            exitFound=true;
+                        }
+                    }
+                }
+            }
+        }
+        return exitFound;
+    }
+
+
+
+    private boolean isEnd(int x, int y){
+        if (y==map[0].length-1){
+            if (x>=(map.length/2)-5&&x<(map.length/2)+5)
+                return true;
+        }
+        return false;
+    }
+
+
+    public void randomizeMap(){
+        map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
+        for (int x=0; x<map.length; x+=1){
+            for (int y=0; y<map[0].length; y+=1){
+                if (x==0||y==0||x==map.length-1||y==map[0].length-1){
+                    map[x][y]=true;
+                }
+                if (!(x%2==0&&y%2==0)){
+                    if (Math.random()<.3){
+                        map[x][y]=true;
+                    }
+                }else {
+                    if (Math.random()<.6) {
+                        map[x][y] = true;
+                    }
+                }
+            }
+        }
+        for (int i=0; i<10; i++) {
+            map[(map.length / 2) - 5 + i][0] = false;
+            map[(map.length / 2) - 5 + i][map[0].length-1] = false;
+
+        }
+    }
+
+    public void createRunnableMaze(){
+        randomizeMap();
+        checked=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
+        System.out.println();
+        while (!canSolve((water.length / 2), 0, 0, -1,-1)){
+            randomizeMap();
+            checked=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
         }
     }
 
