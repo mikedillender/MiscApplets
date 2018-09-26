@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=400, HEIGHT=1500;
+    private final int WIDTH=1000, HEIGHT=1000;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -17,18 +17,14 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color waterc=new Color(100,100,250);
     Color gridColor=new Color(150, 150,150);
-    int tilesize=1;
+    int tilesize=10;
 
     //"CHARACTER"
     float[][] water=new float[WIDTH/tilesize][HEIGHT/tilesize];
-    boolean[][] map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
-    boolean[][] inputMap;
+    int[][] map=new int[WIDTH/tilesize][HEIGHT/tilesize];
+
 
     //CONTROLS
-    boolean pressingW;
-    boolean pressingA;
-    boolean pressingS;
-    boolean pressingD;
     boolean[][] checked;
 
 
@@ -40,42 +36,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         thread=new Thread(this);
         thread.start();
         water=new float[WIDTH/tilesize][HEIGHT/tilesize];
-        map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
-        /*int[][] m1=new int[][]{
-                {0,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,1,1,1,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,1,1,0,1,1,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0},
-                {0,0,1,1,0,0,0,1,1,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0}
-        };
-        //intToBool(m1);
-        //invertMap();
-        //scaleMap(inputMap);
-        */
-        checked=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
-        createRunnableMaze();
-    }
-
-    private void intToBool(int[][] m1){
-        inputMap=new boolean[m1.length][m1[0].length];
-        for (int x=0; x<inputMap.length; x++){
-            for (int y=0; y<inputMap[0].length; y++){
-                inputMap[x][y]=m1[x][y]==1;
-            }
-        }
-    }
-
-    private void invertMap(){
-        boolean[][] m1=new boolean[inputMap[0].length][inputMap.length];
-        for (int x=0; x<inputMap.length; x++){
-            for (int y=0; y<inputMap[0].length; y++){
-                m1[y][x]=inputMap[x][y];
-            }
-        }
-        inputMap=m1;
+        randomizeMap();
     }
 
     public void paint(Graphics g){
@@ -117,7 +78,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
         repaint();//UPDATES FRAME
-        try{ Thread.sleep(3); } //ADDS TIME BETWEEN FRAMES (FPS)
+        try{ Thread.sleep(50); } //ADDS TIME BETWEEN FRAMES (FPS)
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
@@ -165,7 +126,7 @@ public class Main extends Applet implements Runnable, KeyListener {
                     break;
             }
             if (isValidLoc(x1, y1)){
-                if (!map[x1][y1]) {
+                if (map[x1][y1]<1) {
                     if (dir != 0) {
                         float avg = water[x][y] + water[x1][y1];
                         avg /= 2;
@@ -184,13 +145,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         }
     }
 
-    private void scaleMap(boolean[][] m1){
-        for (int x=0; x<map.length; x++){
-            for (int y=0; y<map[0].length; y++){
-                map[x][y]=m1[(int)(Math.floor(((double)x/map.length)*m1.length))][(int)(Math.floor(((double)y/map[0].length)*m1[0].length))];
-            }
-        }
-    }
+
 
     private boolean isValidLoc(int x, int y){
         if (x>=0&&y>=0){
@@ -205,8 +160,20 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         for (int x=0; x<water.length; x++){
             for (int y=0; y<water[0].length; y++){
-                if (map[x][y]){
-                    gfx.setColor(Color.BLACK);
+                if (map[x][y]!=0){
+                    switch (map[x][y]){
+                        case -1:
+                            gfx.setColor(new Color(70, 60, 45));
+                            break;
+                        case 1:
+                            gfx.setColor(new Color(140, 120, 90));
+                            break;
+                        case 2:
+                            gfx.setColor(new Color(70, 100, 70));
+                            break;
+                        case 4:
+                    }
+
                     gfx.fillRect(x * tilesize, y * tilesize, tilesize, tilesize);
                 }
                 if (water[x][y]>10) {
@@ -237,7 +204,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             }
             if (isValidLoc(x1, y1)){
                 if (!checked[x1][y1]) {
-                    if (!map[x1][y1]) {
+                    if (map[x1][y1]<1) {
                         //System.out.println("checking "+x+", "+y);
                         if (canSolve(x1, y1, reccount+1, x, y )){
                             System.out.println("CAN SOLVE");
@@ -262,28 +229,23 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     public void randomizeMap(){
-        map=new boolean[WIDTH/tilesize][HEIGHT/tilesize];
+        map=new int[WIDTH/tilesize][HEIGHT/tilesize];
+        int groundlvl=map[0].length/3;
         for (int x=0; x<map.length; x+=1){
-            for (int y=0; y<map[0].length; y+=1){
-                if (x==0||y==0||x==map.length-1||y==map[0].length-1){
-                    map[x][y]=true;
-                }
-                if (!(x%2==0&&y%2==0)){
-                    if (Math.random()<.3){
-                        map[x][y]=true;
-                    }
-                }else {
-                    if (Math.random()<.6) {
-                        map[x][y] = true;
-                    }
+            for (int y=0; y<map[0].length; y+=1) {
+                if (y>groundlvl){
+                    map[x][y]=1;
+                }else if (y==groundlvl){
+                    map[x][y]=2;
                 }
             }
+            if (Math.random()<.2){
+                groundlvl--;
+            }else if (Math.random()<.25){
+                groundlvl++;
+            }
         }
-        for (int i=0; i<10; i++) {
-            map[(map.length / 2) - 5 + i][0] = false;
-            map[(map.length / 2) - 5 + i][map[0].length-1] = false;
 
-        }
     }
 
     public void createRunnableMaze(){
