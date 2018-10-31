@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 public class Main extends Applet implements Runnable {
 
-    private final int WIDTH=1900, HEIGHT=900;
+    private final int WIDTH=1200, HEIGHT=900;
 
     private Thread thread;
     Graphics gfx;
@@ -36,7 +36,7 @@ public class Main extends Applet implements Runnable {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
         if (!done) {
-            if (vectors < 14) {
+            if (vectors < 10) {
                 movetimer -= 1;
                 if (movetimer < 0) {
                     addVector();
@@ -59,17 +59,28 @@ public class Main extends Applet implements Runnable {
         float mid=getAvgInRange(0, 1);
         float q1=getAvgInRange(0, mid);
         float q3=getAvgInRange(mid, 1);
-
+        float q1tomid=getAvgInRange(q1, mid);
+        float midtoq3=getAvgInRange(mid, q3);
+        float q4=getAvgInRange(q3, 1);
+        float q0=getAvgInRange(0, q1);
 
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                if (map[x][y]<q1){
+                if (map[x][y]<q0){
                     map[x][y]=0;
+                }else if(map[x][y]<q1){
+                    map[x][y]=.1f;
+                }else if (map[x][y]<q1tomid){
+                    map[x][y]=.2f;
                 }else if (map[x][y]<mid){
-                    map[x][y]=.33f;
+                    map[x][y]=.4f;
+                }else if (map[x][y]<midtoq3){
+                    map[x][y]=.6f;
                 }else if (map[x][y]<q3){
-                    map[x][y]=.66f;
-                }else{
+                    map[x][y]=.8f;
+                }else if (map[x][y]<q4){
+                    map[x][y]=.9f;
+                }else {
                     map[x][y]=1.0f;
                 }
             }
@@ -102,7 +113,7 @@ public class Main extends Applet implements Runnable {
             for (int y=0; y<map[0].length; y++){
                 float pb1=y-(pslope*x);
                 float xint=(b-pb1)/(pslope-slope);
-                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28)+1;
+                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28*2)+1;
                 value/=2;
                 map[x][y] = (map[x][y] * (1 - weight)) + (value * weight);
             }
@@ -115,6 +126,13 @@ public class Main extends Applet implements Runnable {
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
                 gfx.setColor(new Color((int)(map[x][y]*255),(int)(map[x][y]*255),(int)(map[x][y]*255)));
+                if (done) {
+                    if (map[x][y] == 0) {
+                        gfx.setColor(new Color(100, 100, 200));
+                    } else {
+                        gfx.setColor(new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2));
+                    }
+                }
                 gfx.fillRect(x , y , 1,1);
             }
         }
