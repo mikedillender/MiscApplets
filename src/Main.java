@@ -36,7 +36,7 @@ public class Main extends Applet implements Runnable {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
         if (!done) {
-            if (vectors < 20) {
+            if (vectors < 14) {
                 movetimer -= 1;
                 if (movetimer < 0) {
                     addVector();
@@ -53,17 +53,42 @@ public class Main extends Applet implements Runnable {
     } }
 
     public void createThreshhold(){
-        float threshold=.5f;
+        //float threshold=.5f;
+        float[][] map1=map;
+
+        float mid=getAvgInRange(0, 1);
+        float q1=getAvgInRange(0, mid);
+        float q3=getAvgInRange(mid, 1);
+
+
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                float threshold1=threshold*((float)y/map[0].length);
-                if (map[x][y]<threshold){
+                if (map[x][y]<q1){
                     map[x][y]=0;
-                }else {
-                    map[x][y]=1;
+                }else if (map[x][y]<mid){
+                    map[x][y]=.33f;
+                }else if (map[x][y]<q3){
+                    map[x][y]=.66f;
+                }else{
+                    map[x][y]=1.0f;
                 }
             }
         }
+    }
+
+    public float getAvgInRange(float low, float high){
+        int numTiles=0;
+        float sum=0;
+        for (int x=0; x<map.length; x++){
+            for (int y=0; y<map[0].length; y++){
+                if (map[x][y]<high&&map[x][y]>low){
+                    numTiles++;
+                    sum+=map[x][y];
+                }
+            }
+        }
+        float avg=sum/(float)numTiles;
+        return avg;
     }
 
     public void addVector(){
