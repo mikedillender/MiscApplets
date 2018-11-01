@@ -2,6 +2,8 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
 public class Main extends Applet implements Runnable {
 
     private final int WIDTH=1200, HEIGHT=900;
@@ -44,7 +46,9 @@ public class Main extends Applet implements Runnable {
                 }
             } else {
                 done=true;
+                getQuartiles();
                 createThreshhold();
+                System.out.println("30th percentile = ");
             }
         }
         repaint();//UPDATES FRAME
@@ -87,6 +91,38 @@ public class Main extends Applet implements Runnable {
         }
     }
 
+    private float getPercentile(double percent, ArrayList<Float> quart){
+        return (quart.get((int)(percent*(quart.size()-1))));
+    }
+
+    private ArrayList<Float> getQuartiles(){
+        ArrayList<Float> ranges=new ArrayList<>();
+        ranges.add(0f);
+        ranges.add(1f);
+        ranges=expandQuart(ranges);
+        ranges=expandQuart(ranges);
+        ranges=expandQuart(ranges);
+        ranges=expandQuart(ranges);
+        ranges=expandQuart(ranges);
+        ranges=expandQuart(ranges);
+        for (int i=0; i<ranges.size(); i++){
+            System.out.println(i+" - "+ranges.get(i));
+        }
+        return ranges;
+    }
+
+    private ArrayList<Float> expandQuart(ArrayList<Float> quart){
+        ArrayList<Float> nlist= new ArrayList<>();
+        for (int i=0; i<quart.size()-1; i++){
+            nlist.add(quart.get(i));
+            nlist.add(getAvgInRange(quart.get(i),quart.get(i+1)));
+        }
+        nlist.add(quart.get(quart.size()-1));
+
+        return nlist;
+
+    }
+
     public float getAvgInRange(float low, float high){
         int numTiles=0;
         float sum=0;
@@ -113,7 +149,7 @@ public class Main extends Applet implements Runnable {
             for (int y=0; y<map[0].length; y++){
                 float pb1=y-(pslope*x);
                 float xint=(b-pb1)/(pslope-slope);
-                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28*2)+1;
+                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28*5)+1;
                 value/=2;
                 map[x][y] = (map[x][y] * (1 - weight)) + (value * weight);
             }
