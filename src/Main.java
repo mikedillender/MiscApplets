@@ -16,6 +16,7 @@ public class Main extends Applet implements Runnable {
     int vectors=0;
     boolean done=false;
     int movetimer=20;
+    ArrayList<Float> ranges;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -38,7 +39,7 @@ public class Main extends Applet implements Runnable {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
         if (!done) {
-            if (vectors < 10) {
+            if (vectors < 5) {
                 movetimer -= 1;
                 if (movetimer < 0) {
                     addVector();
@@ -46,9 +47,11 @@ public class Main extends Applet implements Runnable {
                 }
             } else {
                 done=true;
-                getQuartiles();
+                ranges=getQuartiles();
+                scaleWithParabola();
+                scaleUpSides();
                 createThreshhold();
-                System.out.println("30th percentile = ");
+                //System.out.println("30th percentile = ");
             }
         }
         repaint();//UPDATES FRAME
@@ -56,36 +59,35 @@ public class Main extends Applet implements Runnable {
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
+
+
+    public void scaleWithParabola(){
+        float weight=3.5f;
+        double a=4.0/map[0].length;
+        double ry=map[0].length/4;
+        for (int x=0; x<map.length; x++){
+            int cx=(-map.length/2+x);
+            int cy=(int)(ry*((a*cx)*(a*cx)));
+            if (cy<0){cy=0;}else if (cy>map[0].length){cy=map[0].length;}
+            System.out.println("f("+cx+") = "+cy);
+            for (int y=0; y<map[0].length; y++){
+                float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
+                if (r>1){r=1;}else if (r<0){r=0;}
+                map[x][y]=(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight);
+            }
+        }
+    }
+
+
     public void createThreshhold(){
-        //float threshold=.5f;
-        float[][] map1=map;
-
-        float mid=getAvgInRange(0, 1);
-        float q1=getAvgInRange(0, mid);
-        float q3=getAvgInRange(mid, 1);
-        float q1tomid=getAvgInRange(q1, mid);
-        float midtoq3=getAvgInRange(mid, q3);
-        float q4=getAvgInRange(q3, 1);
-        float q0=getAvgInRange(0, q1);
-
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                if (map[x][y]<q0){
-                    map[x][y]=0;
-                }else if(map[x][y]<q1){
-                    map[x][y]=.1f;
-                }else if (map[x][y]<q1tomid){
-                    map[x][y]=.2f;
-                }else if (map[x][y]<mid){
-                    map[x][y]=.4f;
-                }else if (map[x][y]<midtoq3){
-                    map[x][y]=.6f;
-                }else if (map[x][y]<q3){
-                    map[x][y]=.8f;
-                }else if (map[x][y]<q4){
-                    map[x][y]=.9f;
+                if (map[x][y]<ranges.get(ranges.size()/3)){
+                    map[x][y]=.25f;
+                }else if (map[x][y]<ranges.get(ranges.size()/3*2)){
+                    map[x][y]=.5f;
                 }else {
-                    map[x][y]=1.0f;
+                    map[x][y]=.75f;
                 }
             }
         }
@@ -106,7 +108,7 @@ public class Main extends Applet implements Runnable {
         ranges=expandQuart(ranges);
         ranges=expandQuart(ranges);
         for (int i=0; i<ranges.size(); i++){
-            System.out.println(i+" - "+ranges.get(i));
+            //System.out.println(i+" - "+ranges.get(i));
         }
         return ranges;
     }
@@ -136,6 +138,23 @@ public class Main extends Applet implements Runnable {
         }
         float avg=sum/(float)numTiles;
         return avg;
+    }
+
+    public void scaleUpSides(){
+        float max=(getPercentile(.2, ranges)+getPercentile(.8, ranges))/2f;
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT/10; y++){
+                map[x][HEIGHT-1-y]=((y*map[x][HEIGHT-1-y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
+                map[x][y]=((y*map[x][y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
+            }
+        }
+        for (int x=0; x<WIDTH/10; x++){
+            for (int y=0; y<HEIGHT; y++){
+                map[WIDTH-1-x][y]=((x*map[WIDTH-x-1][y])+((WIDTH/10-x)*max))/(WIDTH/10);
+                map[x][y]=((x*map[x][y])+((WIDTH/10-x)*max))/(WIDTH/10);
+            }
+        }
+
     }
 
     public void addVector(){
@@ -169,7 +188,7 @@ public class Main extends Applet implements Runnable {
                         gfx.setColor(new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2));
                     }
                 }
-                gfx.fillRect(x , y , 1,1);
+                gfx.fillRect(x , HEIGHT-y , 1,1);
             }
         }
     }
