@@ -6,8 +6,9 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable {
 
-    private final int WIDTH=1200, HEIGHT=900;
-
+    private final int sWIDTH=800, sHEIGHT=400;
+    int ppt=16;
+    private final int WIDTH=800/ppt, HEIGHT=800/ppt;
     private Thread thread;
     Graphics gfx;
     Image img;
@@ -20,8 +21,8 @@ public class Main extends Applet implements Runnable {
 
 
     public void init(){//STARTS THE PROGRAM
-        this.resize(WIDTH, HEIGHT);
-        img=createImage(WIDTH,HEIGHT);
+        this.resize(sWIDTH, sHEIGHT);
+        img=createImage(sWIDTH,sHEIGHT);
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
@@ -39,7 +40,7 @@ public class Main extends Applet implements Runnable {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
         if (!done) {
-            if (vectors < 5) {
+            if (vectors < 10) {
                 movetimer -= 1;
                 if (movetimer < 0) {
                     addVector();
@@ -50,6 +51,7 @@ public class Main extends Applet implements Runnable {
                 ranges=getQuartiles();
                 scaleWithParabola();
                 scaleUpSides();
+                //flatten();
                 createThreshhold();
                 //System.out.println("30th percentile = ");
             }
@@ -59,10 +61,18 @@ public class Main extends Applet implements Runnable {
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
-
+    public void flatten(){
+        float[][] map2=new float[map.length][map[0].length];
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT/2; y++){
+                map2[x][y]=(map[x][y*2]+map[x][y*2+1])/2f;
+            }
+        }
+        map=map2;
+    }
 
     public void scaleWithParabola(){
-        float weight=3.5f;
+        float weight=2.5f;
         double a=4.0/map[0].length;
         double ry=map[0].length/4;
         for (int x=0; x<map.length; x++){
@@ -84,10 +94,13 @@ public class Main extends Applet implements Runnable {
             for (int y=0; y<map[0].length; y++){
                 if (map[x][y]<ranges.get(ranges.size()/3)){
                     map[x][y]=.25f;
+                    map[x][y]=.01f;
                 }else if (map[x][y]<ranges.get(ranges.size()/3*2)){
                     map[x][y]=.5f;
+                    map[x][y]=.01f;
                 }else {
                     map[x][y]=.75f;
+                    //map[x][y]=.01f;
                 }
             }
         }
@@ -188,7 +201,7 @@ public class Main extends Applet implements Runnable {
                         gfx.setColor(new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2));
                     }
                 }
-                gfx.fillRect(x , HEIGHT-y , 1,1);
+                gfx.fillRect(x*ppt , sHEIGHT-(y*ppt) , ppt, ppt);
             }
         }
     }
