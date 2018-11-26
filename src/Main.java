@@ -42,7 +42,7 @@ public class Main extends Applet implements Runnable {
                 movetimer -= 1;
                 if (movetimer < 0) {
                     addVector();
-                    movetimer = 20;
+                    movetimer = 100;
                 }
             } else {
                 done=true;
