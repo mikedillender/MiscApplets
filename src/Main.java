@@ -2,12 +2,14 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.security.Key;
 import java.util.ArrayList;
 
-public class Main extends Applet implements Runnable {
+public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int WIDTH=1200, HEIGHT=900;
-
+    private final int sWIDTH=1600, sHEIGHT=1600;
+    int ppt=16;
+    private final int WIDTH=1600/ppt, HEIGHT=1600/ppt;
     private Thread thread;
     Graphics gfx;
     Image img;
@@ -16,15 +18,18 @@ public class Main extends Applet implements Runnable {
     int vectors=0;
     boolean done=false;
     int movetimer=20;
+    ArrayList<Float> ranges;
 
 
     public void init(){//STARTS THE PROGRAM
-        this.resize(WIDTH, HEIGHT);
-        img=createImage(WIDTH,HEIGHT);
+        this.resize(sWIDTH, sHEIGHT);
+        img=createImage(sWIDTH,sHEIGHT);
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+        this.addKeyListener(this);
         map=new float[WIDTH][HEIGHT];
+
     }
 
     public void paint(Graphics g){
@@ -41,14 +46,17 @@ public class Main extends Applet implements Runnable {
             if (vectors < 10) {
                 movetimer -= 1;
                 if (movetimer < 0) {
-                    addVector();
-                    movetimer = 100;
+                    //addVector();
+                    movetimer = 20;
                 }
             } else {
                 done=true;
-                getQuartiles();
-                createThreshhold();
-                System.out.println("30th percentile = ");
+
+                //scaleWithParabola();
+                //scaleUpSides();
+                //flatten();
+                //createThreshhold();
+                //System.out.println("30th percentile = ");
             }
         }
         repaint();//UPDATES FRAME
@@ -56,36 +64,57 @@ public class Main extends Applet implements Runnable {
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
+    public void flatten(){
+        float[][] map2=new float[map.length][map[0].length];
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT/2; y++){
+                map2[x][y]=(map[x][y*2]+map[x][y*2+1])/2f;
+            }
+        }
+        map=map2;
+    }
+
+    public void scaleWithParabola(){
+        //float weight=2.5f;
+        //double a=4.0/map[0].length;
+        //double ry=map[0].length/4;
+        float m=.5f;
+        float b=(map[0].length/2);
+        float m1=-.5f;
+        float b1=(map[0].length);
+        for (int x=0; x<map.length; x++){
+            //int cx=(-map.length/2+x);
+            //int cy=(int)(ry*((a*cx)*(a*cx)));
+            //if (cy<0){cy=0;}else if (cy>map[0].length){cy=map[0].length;}
+            //System.out.println("f("+cx+") = "+cy);
+            float cy=m*x+b;
+            float cy1=m1*x+b1;
+            for (int y=0; y<map[0].length; y++){
+                //float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
+                /*if (r>1){r=1;}else if (r<0){r=0;}
+                map[x][y]=r/*(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight)*/;
+                if ((y<cy&&y<cy1)||(y<cy&&x>map.length/3*2)){
+                    map[x][y]=1;
+                }else {
+                    map[x][y]=0;
+                }
+            }
+        }
+    }
+
+
     public void createThreshhold(){
-        //float threshold=.5f;
-        float[][] map1=map;
-
-        float mid=getAvgInRange(0, 1);
-        float q1=getAvgInRange(0, mid);
-        float q3=getAvgInRange(mid, 1);
-        float q1tomid=getAvgInRange(q1, mid);
-        float midtoq3=getAvgInRange(mid, q3);
-        float q4=getAvgInRange(q3, 1);
-        float q0=getAvgInRange(0, q1);
-
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                if (map[x][y]<q0){
-                    map[x][y]=0;
-                }else if(map[x][y]<q1){
-                    map[x][y]=.1f;
-                }else if (map[x][y]<q1tomid){
-                    map[x][y]=.2f;
-                }else if (map[x][y]<mid){
-                    map[x][y]=.4f;
-                }else if (map[x][y]<midtoq3){
-                    map[x][y]=.6f;
-                }else if (map[x][y]<q3){
-                    map[x][y]=.8f;
-                }else if (map[x][y]<q4){
-                    map[x][y]=.9f;
+                if (map[x][y]<ranges.get(ranges.size()/3)){
+                    map[x][y]=.25f;
+                    map[x][y]=.01f;
+                }else if (map[x][y]<ranges.get(ranges.size()/3*2)){
+                    map[x][y]=.5f;
+                    map[x][y]=.01f;
                 }else {
-                    map[x][y]=1.0f;
+                    map[x][y]=.75f;
+                    //map[x][y]=.01f;
                 }
             }
         }
@@ -106,7 +135,7 @@ public class Main extends Applet implements Runnable {
         ranges=expandQuart(ranges);
         ranges=expandQuart(ranges);
         for (int i=0; i<ranges.size(); i++){
-            System.out.println(i+" - "+ranges.get(i));
+            //System.out.println(i+" - "+ranges.get(i));
         }
         return ranges;
     }
@@ -138,6 +167,23 @@ public class Main extends Applet implements Runnable {
         return avg;
     }
 
+    public void scaleUpSides(){
+        float max=(getPercentile(.2, ranges)+getPercentile(.8, ranges))/2f;
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT/10; y++){
+                map[x][HEIGHT-1-y]=((y*map[x][HEIGHT-1-y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
+                map[x][y]=((y*map[x][y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
+            }
+        }
+        for (int x=0; x<WIDTH/10; x++){
+            for (int y=0; y<HEIGHT; y++){
+                map[WIDTH-1-x][y]=((x*map[WIDTH-x-1][y])+((WIDTH/10-x)*max))/(WIDTH/10);
+                map[x][y]=((x*map[x][y])+((WIDTH/10-x)*max))/(WIDTH/10);
+            }
+        }
+
+    }
+
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
         if (v[1]==v[3]||v[0]==v[2]){return;}
@@ -162,15 +208,42 @@ public class Main extends Applet implements Runnable {
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
                 gfx.setColor(new Color((int)(map[x][y]*255),(int)(map[x][y]*255),(int)(map[x][y]*255)));
-                if (done) {
+                /*if (done) {
                     if (map[x][y] == 0) {
                         gfx.setColor(new Color(100, 100, 200));
                     } else {
                         gfx.setColor(new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2));
                     }
-                }
-                gfx.fillRect(x , y , 1,1);
+                }*/
+                gfx.fillRect(x*ppt , sHEIGHT-(y*ppt) , ppt, ppt);
             }
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if (key == KeyEvent.VK_V) {
+            System.out.println("GAY");
+            addVector();
+        }
+        if (key == KeyEvent.VK_T) {
+            createThreshhold();
+        }
+        if (key == KeyEvent.VK_S) {
+            ranges=getQuartiles();
+            scaleUpSides();
         }
     }
 }
