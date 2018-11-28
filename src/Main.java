@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int sWIDTH=1600, sHEIGHT=1600;
-    int ppt=16;
-    private final int WIDTH=1600/ppt, HEIGHT=1600/ppt;
+    private final int sWIDTH=1600, sHEIGHT=1000;
+    int ppt=4;
+    private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
     Graphics gfx;
     Image img;
@@ -19,6 +19,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     boolean done=false;
     int movetimer=20;
     ArrayList<Float> ranges;
+    ArrayList<int[]> vects=new ArrayList<>();
 
 
     public void init(){//STARTS THE PROGRAM
@@ -187,7 +188,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
         if (v[1]==v[3]||v[0]==v[2]){return;}
-        float slope=(float) (v[1]-v[0])/(float) (v[0]-v[2]);
+        vects.add(v);
+        float slope=(float) (v[3]-v[1])/(float) (v[2]-v[0]);
         float b=v[1]-(slope*v[0]);
         float pslope=-(1/slope);
         float weight=1/((float)vectors+1);
@@ -204,18 +206,34 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
 
+
+
     public void drawwater(Graphics gfx){
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
                 gfx.setColor(new Color((int)(map[x][y]*255),(int)(map[x][y]*255),(int)(map[x][y]*255)));
-                /*if (done) {
-                    if (map[x][y] == 0) {
-                        gfx.setColor(new Color(100, 100, 200));
-                    } else {
-                        gfx.setColor(new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2));
-                    }
-                }*/
-                gfx.fillRect(x*ppt , sHEIGHT-(y*ppt) , ppt, ppt);
+                gfx.fillRect(x*ppt , (y*ppt) , ppt, ppt);
+            }
+        }
+
+        /*gfx.setColor(Color.RED);
+        for (int i=0; i<vects.size(); i++){
+            gfx.drawLine(vects.get(i)[0],vects.get(i)[1],vects.get(i)[2],vects.get(i)[3]);
+        }*/
+    }
+
+    public void scaleWithSine(){
+        float period=map.length/2;
+        float b=(2*3.14f)/period;
+        float a=map[0].length/3;
+        float vshift=map[0].length/2;
+        float weight=.2f;
+        for (int x=0; x<map.length; x++){
+
+            float cy=(float)(a*Math.sin(x*b)+vshift);
+            for (int y=0; y<map[0].length; y++){
+                float dy=1-(float)(Math.abs(y-cy))/map[0].length;
+                map[x][y]=((dy*weight)+map[x][y])/(1+weight);
             }
         }
     }
@@ -235,15 +253,19 @@ public class Main extends Applet implements Runnable, KeyListener {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_V) {
-            System.out.println("GAY");
             addVector();
         }
         if (key == KeyEvent.VK_T) {
+            ranges=getQuartiles();
             createThreshhold();
         }
         if (key == KeyEvent.VK_S) {
             ranges=getQuartiles();
-            scaleUpSides();
+            scaleWithSine();
+        }
+        if (key == KeyEvent.VK_R) {
+            vects=new ArrayList<>();
+            vectors=0;
         }
     }
 }
