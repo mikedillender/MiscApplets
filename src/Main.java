@@ -1,7 +1,11 @@
+import javax.imageio.ImageIO;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable {
@@ -48,6 +52,7 @@ public class Main extends Applet implements Runnable {
                 done=true;
                 getQuartiles();
                 createThreshhold();
+                storeImg();
                 System.out.println("30th percentile = ");
             }
         }
@@ -155,6 +160,38 @@ public class Main extends Applet implements Runnable {
             }
         }
         vectors++;
+    }
+
+    public void storeImg(){
+        // Initialize Color[][] however you were already doing so.
+        Color[][] image=new Color[map.length][map[0].length];
+
+        for (int x=0; x<map.length; x++){
+            for (int y=0; y<map[0].length; y++){
+                if (map[x][y] == 0) {
+                    image[x][y]=new Color(100, 00, 00);
+                } else {
+                    image[x][y]=new Color((int) (map[x][y] * 255) / 2, (int) (map[x][y] * 255), (int) (map[x][y] * 255) / 2);
+                }
+            }
+        }
+
+        // Initialize BufferedImage, assuming Color[][] is already properly populated.
+        BufferedImage bufferedImage = new BufferedImage(image.length, image[0].length,
+                BufferedImage.TYPE_INT_RGB);
+
+        // Set each pixel of the BufferedImage to the color from the Color[][].
+        for (int x = 0; x < image.length; x++) {
+            for (int y = 0; y < image[x].length; y++) {
+                bufferedImage.setRGB(x, y, image[x][y].getRGB());
+            }
+        }
+        File outputfile = new File("C:\\Users\\Mike\\Downloads\\image.jpg");
+        try {
+            ImageIO.write(bufferedImage, "jpg", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
