@@ -10,6 +10,11 @@ public class Node {
                 connections.add(new int[]{1,1});
                 connections.add(new int[]{2,1});
                 break;
+            case 1:
+                pos=new int[]{5,1};
+                connections.add(new int[]{1,1});
+                connections.add(new int[]{2,1});
+                break;
             case 2:
                 pos=new int[]{5,1};
                 connections.add(new int[]{1,1});
