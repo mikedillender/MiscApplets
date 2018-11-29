@@ -7,19 +7,15 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int sWIDTH=800, sHEIGHT=800;
+    private final int sWIDTH=800, sHEIGHT=900;
     int ppt=16;
     private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
     Graphics gfx;
     Image img;
 
-    float[][] map;
-    int vectors=0;
-    boolean done=false;
-    int movetimer=20;
-    ArrayList<Float> ranges;
 
+    Node[] nodes;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(sWIDTH, sHEIGHT);
@@ -28,8 +24,10 @@ public class Main extends Applet implements Runnable, KeyListener {
         thread=new Thread(this);
         thread.start();
         this.addKeyListener(this);
-        map=new float[WIDTH][HEIGHT];
-
+        nodes=new Node[25];
+        for (int i=0; i<nodes.length; i++){
+            nodes[i]=new Node(i);
+        }
     }
 
     public void paint(Graphics g){
@@ -42,18 +40,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
-        if (!done) {
-            if (vectors < 10) {
-                movetimer -= 1;
-                if (movetimer < 0) {
-                    //addVector();
-                    movetimer = 20;
-                }
-            } else {
-                done=true;
 
-            }
-        }
         repaint();//UPDATES FRAME
         try{ Thread.sleep(20); } //ADDS TIME BETWEEN FRAMES (FPS)
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
@@ -62,11 +49,9 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     public void draw(Graphics gfx){
-        for (int x=0; x<map.length; x++){
-            for (int y=0; y<map[0].length; y++){
-                gfx.setColor(new Color((int)(map[x][y]*255),(int)(map[x][y]*255),(int)(map[x][y]*255)));
-                gfx.fillRect(x*ppt , sHEIGHT-(y*ppt) , ppt, ppt);
-            }
+        for (int i=0; i<nodes.length; i++){
+            gfx.drawString(i+"",100*nodes[i].getPos()[0],100*nodes[i].getPos()[1]);
+            gfx.drawRect(100*nodes[i].getPos()[0],100*nodes[i].getPos()[1], 10,10);
         }
     }
 
