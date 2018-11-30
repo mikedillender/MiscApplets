@@ -15,6 +15,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     Image img;
     Node[] nodes;
     int[][] paths;
+    int[] pathUse;
     int[] nodeUse;
 
     public void init(){//STARTS THE PROGRAM
@@ -33,6 +34,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (int i=0; i<nodes.length; i++){
             nodes[i].addConnections(paths);
         }
+        pathUse=new int[paths.length];
 
     }
 
@@ -94,7 +96,9 @@ public class Main extends Applet implements Runnable, KeyListener {
             for (int i=0; i<r.length; i++){
                 nodeUse[r[i]]++;
                 if (i>0){
-                    rt+=paths[getRouteBetween(r[i], r[i-1])][2];
+                    int path=paths[getRouteBetween(r[i], r[i-1])][2];
+                    rt+=paths[path][2];
+                    pathUse[path]++;
                 }
             }
         }
