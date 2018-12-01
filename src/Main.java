@@ -2,6 +2,7 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Line2D;
 import java.security.Key;
 import java.util.ArrayList;
 
@@ -59,19 +60,20 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     public void draw(Graphics gfx){
-        for (int i=0; i<nodes.length; i++){
-            int size=10+(10*nodeUse[i]);
-            gfx.setColor(new Color(0,0,0));
-            gfx.fillRect(100*nodes[i].getPos()[0]-(size/2),100*nodes[i].getPos()[1]-(size/2), size, size);
-            gfx.drawString(i+"",100*nodes[i].getPos()[0]+size,100*nodes[i].getPos()[1]);
+        Graphics2D g2 = (Graphics2D) gfx;
+        for (int i=0; i<paths.length; i++){
+            if (pathUse[i]==0){ gfx.setColor(new Color(100,100,100)); }else {gfx.setColor(new Color(0,0,0));}
+            g2.setStroke(new BasicStroke(pathUse[i]*2+1));
+            g2.drawLine(100*nodes[paths[i][0]].getPos()[0],100*nodes[paths[i][0]].getPos()[1],100*nodes[paths[i][1]].getPos()[0],100*nodes[paths[i][1]].getPos()[1]);
+
+
         }
         gfx.setColor(new Color(0,0,0));
-
         for (int i=0; i<nodes.length; i++){
-            for (int c=0; c<nodes[i].connections.size(); c++){
-                gfx.drawLine(100*nodes[i].getPos()[0],100*nodes[i].getPos()[1],100*nodes[nodes[i].getConnections().get(c)[0]].getPos()[0],100*nodes[nodes[i].getConnections().get(c)[0]].getPos()[1]);
-
-            }
+            int size=10+(3*nodeUse[i]);
+            if (nodeUse[i]==0){ gfx.setColor(new Color(100,100,100)); }else {gfx.setColor(new Color(0,0,0));}
+            gfx.fillRect(100*nodes[i].getPos()[0]-(size/2),100*nodes[i].getPos()[1]-(size/2), size, size);
+            gfx.drawString(i+"",100*nodes[i].getPos()[0]+size,100*nodes[i].getPos()[1]);
         }
     }
 
@@ -87,6 +89,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void getDayRoute(){
         nodeUse=new int[25];
+        pathUse=new int[paths.length];
         ArrayList<int[]> day=new ArrayList<>();
         int[] s=new int[]{0,10,12,4,1,9,2};
         int rt=0;
@@ -96,7 +99,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             for (int i=0; i<r.length; i++){
                 nodeUse[r[i]]++;
                 if (i>0){
-                    int path=paths[getRouteBetween(r[i], r[i-1])][2];
+                    int path=getRouteBetween(r[i], r[i-1]);
                     rt+=paths[path][2];
                     pathUse[path]++;
                 }
