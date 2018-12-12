@@ -15,8 +15,11 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     //COLORS
     Color background=new Color(255, 255, 255);
-    Color gridColor=new Color(150, 150,150);
+    Color gridColor=new Color(0,0,0);
 
+    int[] grades;
+
+    int selected=0;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -26,13 +29,20 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+        grades=new int[]{90,90,90};
     }
 
     public void paint(Graphics g){
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
+        gfx.setColor(gridColor);
+        for (int i=0; i<grades.length; i++){
+            gfx.drawString(i+" "+grades[i],100,100+20*i);
+        }
+        double avg=getAvg();
+        gfx.drawString("avg="+avg,100,300);
+        gfx.drawString("savg="+((avg+86.46)/2.0+5),100,330);
 
         //RENDER FOREGROUND
 
@@ -56,9 +66,32 @@ public class Main extends Applet implements Runnable, KeyListener {
     } }
 
 
+    private double getAvg(){
+        double quizes=562+grades[2];
+        double tquizes=700+100;
+        double tests=343+grades[0]+grades[1];
+        double ttests=400+200;
+        return (40*(quizes/tquizes))+(60*(tests/ttests));
+    }
+
     //INPUT
     public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode()==KeyEvent.VK_UP){
+            if (selected+1<grades.length){
+                selected++;
+            }
+        }
+        if (e.getKeyCode()==KeyEvent.VK_DOWN){
+            if (selected-1>=0){
+                selected--;
+            }
+        }
+        if (e.getKeyCode()==KeyEvent.VK_LEFT){
+            grades[selected]-=5;
+        }
+        if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+            grades[selected]+=5;
+        }
     }
     public void keyReleased(KeyEvent e) {
 
