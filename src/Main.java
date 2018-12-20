@@ -40,17 +40,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
-
-        goal=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
-        loc=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
-
-        timeWitho2=1;
-        o=(float)(Math.random()*3.14);
-        o1=(float)(Math.random()*3.14/10);
-        o2=(float)(Math.random()*3.14/10);
-        oldlocs=new ArrayList<>();
-        oldlocs.add(loc);
-
+        reset();
     }
 
     public void paint(Graphics g){
@@ -91,55 +81,48 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         timeWitho2--;
         if (timeWitho2<1){
-            resetO2(dor);
+            resetO2();
         }
         o=o+o1;
-        if (Math.abs(o1+o2)<3.14f/8) {
+        if (Math.abs(o1+o2)<3.14f*3/32) {
             o1 = o1 + o2;
         }else {
-            resetO2(dor);
+            resetO2();
         }
         oldlocs.add(loc);
         //o=dor;
 
         loc=new float[]{loc[0]+(float)(Math.cos(o)*speed),loc[1]+(float)(Math.sin(o)*speed)};
     }
-    public void resetO2(float dor){
-        timeWitho2=(int)(Math.random()*5)+3;
-        //float ddor=dor-o;
-        //if (ddor>3.14){
-            //ddor=-3.14f+ddor;
-        //}
-        o2=(float)((3.14f/4*Math.random())-(3.14f/8))/5;
-        //System.out.println(o+" must use slope "+ddor+" to get to "+dor);
-        //o2=(float)(Math.random()*ddor)/10f;
-        //timeWitho2=(int)(Math.abs(ddor/o2));
-    }
-
-    public void moveO2ToDor(){
+    public void resetO2(){
         float dor=(float)(Math.atan((goal[1]-loc[1])/(goal[0]-loc[0])));
         if ((goal[0]-loc[0])<0){ dor=dor+3.14f; }
 
         float ddor=dor-o;//ddor = the change needed to get in line
+
         if (ddor>3.14){
             ddor=-3.14f+ddor;
         }
-        float weight=.1f;
-        float no2=(o1+(ddor*weight))/(1+weight);
-        o1=no2;
-        /*
-        if (Math.abs(no2)<3.14f/8) {
-            o1 = no2;
-        }else {
-            o1=no2%(3.14f/8);
-            //resetO2(dor);
-        }*/
+
+        float dddor=ddor-o1;
+
+        o2=(float)(Math.random()*dddor/1);
+        float rand=(float)(3.14/16*Math.random())-(3.14f/32);
+        o2=(o2+rand)/2f;
+
+
+        timeWitho2=(int)(Math.random()*15*Math.random())+1;
+        //timeWitho2=(int)(Math.random()*(ddor/o2))+1;
+
     }
 
+
+
     private void finish(){
-        while (!hasReachedEnd()){
+        long startt=System.currentTimeMillis();
+        while (!hasReachedEnd()&&System.currentTimeMillis()<startt+2000){
             move();
-            moveO2ToDor();
+            //moveO2ToDor();
         }
     }
 
@@ -148,8 +131,14 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     public void reset(){
-        goal=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
-        loc=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
+        //goal=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
+        //loc=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
+
+        //goal=new float[]{(float)-(Math.random()*WIDTH*.1)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
+        //loc=new float[]{(float)(Math.random()*WIDTH*.1)+(WIDTH*5/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
+
+        loc=new float[]{(float)(Math.random()*WIDTH*3/4)+(WIDTH/8),(float)-(Math.random()*HEIGHT*.1)+(HEIGHT/6)};
+        goal=new float[]{(float)(Math.random()*WIDTH*3/4)+(WIDTH/8),(float)(Math.random()*HEIGHT*.1)+(HEIGHT*5/6)};
 
         timeWitho2=1;
         o=(float)(Math.random()*3.14);
@@ -167,18 +156,61 @@ public class Main extends Applet implements Runnable, KeyListener {
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
+    public void straighten(){
+        int r=1;
+        for (int i=r; i<oldlocs.size()-r;i++){
+            float sumx=0;
+            float sumy=0;
+            for (int z=i-r; z<=i+r; z++){
+                sumx+=oldlocs.get(z)[0];
+                sumy+=oldlocs.get(z)[1];
+            }
+            sumx=sumx/(2*r+1);
+            sumy=sumy/(2*r+1);
+            oldlocs.set(i, new float[]{sumx,sumy});
+        }
+    }
+
+    private void pullDown(){
+        int r=3;
+        float weight=.3f;
+        for (int i=oldlocs.size()-1; i>0;i--){
+            float sumx=0;
+            float sumy=0;
+            float miny=0;
+            int amt=0;
+            for (int z=i-r; z<=i+r; z++){
+                if (z<1||z>=oldlocs.size()){continue;}
+                amt++;
+                sumx+=oldlocs.get(z)[0];
+                sumy+=oldlocs.get(z)[1];
+                if (oldlocs.get(z)[1]>miny){
+                    miny=oldlocs.get(z)[1];
+                }
+            }
+            sumx=sumx/amt;
+            sumy=sumy/amt;
+            sumy=(sumy+(weight*miny))/(1+weight);
+            oldlocs.set(i, new float[]{oldlocs.get(i)[0],sumy});
+        }
+    }
 
     //INPUT
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode()==KeyEvent.VK_SPACE){
             move();
-            moveO2ToDor();
         }
         if (e.getKeyCode()==KeyEvent.VK_R){
             reset();
         }
         if (e.getKeyCode()==KeyEvent.VK_F){
             finish();
+        }
+        if (e.getKeyCode()==KeyEvent.VK_S){
+            straighten();
+        }
+        if (e.getKeyCode()==KeyEvent.VK_G){
+            pullDown();
         }
     }
     public void keyReleased(KeyEvent e) {
