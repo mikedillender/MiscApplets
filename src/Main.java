@@ -4,9 +4,11 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class Main extends Applet implements Runnable, KeyListener {
+public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
     private final int WIDTH=1280, HEIGHT=900;
@@ -22,6 +24,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color gridColor=new Color(0);
     Color goalColor=new Color(255,0,0);
 
+    boolean isRunning=false;
 
     int timeWitho2;
     float[] goal;
@@ -40,6 +43,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+        addMouseListener(this);
         reset();
     }
 
@@ -107,6 +111,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         float dddor=ddor-o1;
 
         o2=(float)(Math.random()*dddor/1);
+        //o2=(float)(3.14/16*Math.random())-(3.14f/32);
         float rand=(float)(3.14/16*Math.random())-(3.14f/32);
         o2=(o2+rand)/2f;
 
@@ -151,6 +156,10 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
             //UPDATES
+            if (isRunning){
+                move();
+                //straighten();
+            }
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
@@ -212,11 +221,40 @@ public class Main extends Applet implements Runnable, KeyListener {
         if (e.getKeyCode()==KeyEvent.VK_G){
             pullDown();
         }
+        if (e.getKeyCode()==KeyEvent.VK_P){
+            isRunning=!isRunning;
+        }
+
     }
     public void keyReleased(KeyEvent e) {
 
     }
     public void keyTyped(KeyEvent e) { }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        goal=new float[]{e.getX(), e.getY()};
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
 
