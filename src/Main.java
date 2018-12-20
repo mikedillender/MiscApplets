@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1280, HEIGHT=900;
+    private final int WIDTH=3000, HEIGHT=2000;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -25,12 +25,17 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     Color goalColor=new Color(255,0,0);
 
     boolean isRunning=false;
+    boolean straightening=false;
 
     int timeWitho2;
     float[] goal;
 
+
+    int movesPerRef=3;
     ArrayList<float[]> oldlocs;
+    ArrayList<float[]> oldcolors;
     float[] loc;
+    float[] color;
     float speed=7;
     float o=0;//orientation
     float o1=0;//rate of change
@@ -53,6 +58,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
         renderRope(gfx);
         gfx.drawString("o = "+o+", o1 = "+o1+", o2 = "+o2, 100,100);
+        gfx.drawString("speed = "+movesPerRef, 100,130);
         gfx.setColor(goalColor);
         gfx.fillRect((int)goal[0],(int)goal[1],10,10);
 
@@ -66,6 +72,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     public void renderRope(Graphics g){
         g.setColor(gridColor);
         for (int i=0; i<oldlocs.size(); i++){
+            Color col=new Color((int)(oldcolors.get(i)[0]),(int)(oldcolors.get(i)[1]),(int)(oldcolors.get(i)[2]));
+            g.setColor(col);
+
             g.fillRect((int)oldlocs.get(i)[0],(int)oldlocs.get(i)[1],5,5);
         }
     }
@@ -93,7 +102,20 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }else {
             resetO2();
         }
+
+        float[] color2=new float[3];
+        for (int i=0; i<3; i++){
+            float change=-10+(float)(20*Math.random());
+            if (color[i]+change>0&&color[i]+change<255){
+                color2[i]=color[i]+change;
+            }else {
+                color2[i]=color[i];
+            }
+        }
+        color=color2;
+
         oldlocs.add(loc);
+        oldcolors.add(color);
         //o=dor;
 
         loc=new float[]{loc[0]+(float)(Math.cos(o)*speed),loc[1]+(float)(Math.sin(o)*speed)};
@@ -151,14 +173,28 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         o2=(float)(Math.random()*3.14/10);
         oldlocs=new ArrayList<>();
         oldlocs.add(loc);
+        oldcolors=new ArrayList<>();
+        color =new float[]{
+                (float)(Math.random()*255),
+                (float)(Math.random()*255),
+                (float)(Math.random()*255)
+        };
+        oldcolors.add(color);
 
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
             //UPDATES
             if (isRunning){
-                move();
-                //straighten();
+                goal = new float[]{getMousePosition().getLocation().x, getMousePosition().getLocation().y};
+                for (int i=0; i<movesPerRef; i++) {
+                    move();
+                }
+
+            if (straightening) {
+                straighten();
+            }
+            //straighten();
             }
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
@@ -216,6 +252,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             finish();
         }
         if (e.getKeyCode()==KeyEvent.VK_S){
+            straightening=!straightening;
             straighten();
         }
         if (e.getKeyCode()==KeyEvent.VK_G){
@@ -223,6 +260,15 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         if (e.getKeyCode()==KeyEvent.VK_P){
             isRunning=!isRunning;
+        }
+        if (e.getKeyCode()==KeyEvent.VK_LEFT){
+            if (movesPerRef>0){
+                movesPerRef--;
+            }
+        }
+
+        if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+            movesPerRef++;
         }
 
     }
@@ -248,12 +294,12 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        isRunning=true;
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        isRunning=false;
     }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
