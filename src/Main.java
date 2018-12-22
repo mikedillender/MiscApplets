@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=3000, HEIGHT=2000;
+    private final int WIDTH=1500, HEIGHT=1000;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -29,6 +29,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     int timeWitho2;
     float[] goal;
+
+    boolean mouseControlOn=false;
 
 
     int movesPerRef=3;
@@ -61,7 +63,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.drawString("speed = "+movesPerRef, 100,130);
         gfx.setColor(goalColor);
         gfx.fillRect((int)goal[0],(int)goal[1],10,10);
-
+        if (!mouseControlOn){isRunning=true;}
         //RENDER FOREGROUND
 
 
@@ -69,13 +71,17 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         g.drawImage(img,0,0,this);
     }
 
+    boolean lines=true;
     public void renderRope(Graphics g){
         g.setColor(gridColor);
-        for (int i=0; i<oldlocs.size(); i++){
+        for (int i=0; i<oldlocs.size()-1; i++){
             Color col=new Color((int)(oldcolors.get(i)[0]),(int)(oldcolors.get(i)[1]),(int)(oldcolors.get(i)[2]));
             g.setColor(col);
-
-            g.fillRect((int)oldlocs.get(i)[0],(int)oldlocs.get(i)[1],5,5);
+            if (lines){
+                g.drawLine((int) oldlocs.get(i)[0], (int) oldlocs.get(i)[1], (int) oldlocs.get(i+1)[0], (int) oldlocs.get(i+1)[1]);
+            }else {
+                g.fillRect((int) oldlocs.get(i)[0], (int) oldlocs.get(i)[1], 5, 5);
+            }
         }
     }
 
@@ -106,7 +112,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         float[] color2=new float[3];
         for (int i=0; i<3; i++){
             float change=-10+(float)(20*Math.random());
-            if (color[i]+change>0&&color[i]+change<255){
+            if (color[i]+change>0&&color[i]+change<200){
                 color2[i]=color[i]+change;
             }else {
                 color2[i]=color[i];
@@ -186,8 +192,16 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
             //UPDATES
             if (isRunning){
-                goal = new float[]{getMousePosition().getLocation().x, getMousePosition().getLocation().y};
+                if (mouseControlOn) {
+                    goal = new float[]{getMousePosition().getLocation().x, getMousePosition().getLocation().y};
+                }
                 for (int i=0; i<movesPerRef; i++) {
+                    if(!mouseControlOn) {
+                        if (hasReachedEnd()){
+                            goal=new float[]{(float)(Math.random()*WIDTH),(float)(Math.random()*HEIGHT)};
+
+                        }
+                    }
                     move();
                 }
 
@@ -262,9 +276,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             isRunning=!isRunning;
         }
         if (e.getKeyCode()==KeyEvent.VK_LEFT){
-            if (movesPerRef>0){
+            //if (movesPerRef>0){
                 movesPerRef--;
-            }
+            //}
         }
 
         if (e.getKeyCode()==KeyEvent.VK_RIGHT){
@@ -279,28 +293,20 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        goal=new float[]{e.getX(), e.getY()};
-    }
+    public void mousePressed(MouseEvent e) { if(mouseControlOn){goal=new float[]{e.getX(), e.getY()};} }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-        isRunning=true;
-    }
+    public void mouseEntered(MouseEvent e) { if(mouseControlOn){isRunning=true;} }
 
     @Override
-    public void mouseExited(MouseEvent e) {
-        isRunning=false;
-    }
+    public void mouseExited(MouseEvent e) { if(mouseControlOn){isRunning=false;} }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
 
