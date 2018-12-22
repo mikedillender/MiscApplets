@@ -181,9 +181,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         oldlocs.add(loc);
         oldcolors=new ArrayList<>();
         color =new float[]{
-                (float)(Math.random()*255),
-                (float)(Math.random()*255),
-                (float)(Math.random()*255)
+                (float)(Math.random()*200),
+                (float)(Math.random()*200),
+                (float)(Math.random()*200)
         };
         oldcolors.add(color);
 
