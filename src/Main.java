@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener {
 
     private final int sWIDTH=1600, sHEIGHT=1000;
-    int ppt=32;
+    int ppt=4;
     private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
     Graphics gfx;
@@ -76,29 +76,24 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void scaleWithParabola(){
-        //float weight=2.5f;
-        //double a=4.0/map[0].length;
-        //double ry=map[0].length/4;
-        float m=.5f;
-        float b=(map[0].length/2);
-        float m1=-.5f;
-        float b1=(map[0].length);
+        float weight=1f;
+        double a=4.0/map[0].length;
+        double ry=map[0].length/8;
+
         for (int x=0; x<map.length; x++){
-            //int cx=(-map.length/2+x);
-            //int cy=(int)(ry*((a*cx)*(a*cx)));
+            int cx=(-map.length/2+x);
+            int cy=(int)(ry*((a*cx)*(a*cx)));
             //if (cy<0){cy=0;}else if (cy>map[0].length){cy=map[0].length;}
             //System.out.println("f("+cx+") = "+cy);
-            float cy=m*x+b;
-            float cy1=m1*x+b1;
+
             for (int y=0; y<map[0].length; y++){
-                //float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
-                /*if (r>1){r=1;}else if (r<0){r=0;}
-                map[x][y]=r/*(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight)*/;
-                if ((y<cy&&y<cy1)||(y<cy&&x>map.length/3*2)){
-                    map[x][y]=1;
-                }else {
-                    map[x][y]=0;
+                float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
+                if (r>1){r=1;}else if (r<0){r=0;}
+                if (y>cy){
+                    r=.75f;
                 }
+                map[x][y]=r*(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight);
+
             }
         }
     }
@@ -151,6 +146,10 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         return nlist;
 
+    }
+
+    private void scaleDepths(){
+        scaleWithParabola();
     }
 
     public float getAvgInRange(float low, float high){
@@ -281,6 +280,10 @@ public class Main extends Applet implements Runnable, KeyListener {
         if (key == KeyEvent.VK_S) {
             ranges=getQuartiles();
             scaleWithBigCos();
+        }
+        if (key == KeyEvent.VK_D) {
+            ranges=getQuartiles();
+            scaleDepths();
         }
         if (key == KeyEvent.VK_R) {
             vects=new ArrayList<>();
