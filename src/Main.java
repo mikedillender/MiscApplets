@@ -19,6 +19,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     boolean done=false;
     int movetimer=20;
     ArrayList<Float> ranges;
+    int scale=2;
     ArrayList<int[]> vects=new ArrayList<>();
 
 
@@ -80,19 +81,24 @@ public class Main extends Applet implements Runnable, KeyListener {
         double a=4.0/map[0].length;
         double ry=map[0].length/8;
 
-        for (int x=0; x<map.length; x++){
+        for (int x=0; x<map.length; x+=scale){
             int cx=(-map.length/2+x);
             int cy=(int)(ry*((a*cx)*(a*cx)));
             //if (cy<0){cy=0;}else if (cy>map[0].length){cy=map[0].length;}
             //System.out.println("f("+cx+") = "+cy);
 
-            for (int y=0; y<map[0].length; y++){
+            for (int y=0; y<map[0].length; y+=scale){
                 float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
                 if (r>1){r=1;}else if (r<0){r=0;}
                 if (y>cy){
                     r=.75f;
                 }
                 map[x][y]=r*(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight);
+                for (int x1=x; x1<x+scale; x1++){
+                    for (int y1=y; y1<y+scale; y1++){
+                        map[x1][y1]=map[x][y];
+                    }
+                }
 
             }
         }
@@ -194,13 +200,18 @@ public class Main extends Applet implements Runnable, KeyListener {
         float b=v[1]-(slope*v[0]);
         float pslope=-(1/slope);
         float weight=1/((float)vectors+1);
-        for (int x=0; x<map.length; x++){
-            for (int y=0; y<map[0].length; y++){
+        for (int x=0; x<map.length; x+=scale){
+            for (int y=0; y<map[0].length; y+=scale){
                 float pb1=y-(pslope*x);
                 float xint=(b-pb1)/(pslope-slope);
                 float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28*5)+1;
                 value/=2;
                 map[x][y] = (map[x][y] * (1 - weight)) + (value * weight);
+                for (int x1=x; x1<x+scale; x1++){
+                    for (int y1=y; y1<y+scale; y1++){
+                        map[x1][y1]=map[x][y];
+                    }
+                }
             }
         }
         vectors++;
@@ -256,6 +267,39 @@ public class Main extends Applet implements Runnable, KeyListener {
         }
     }
 
+    public void smooth(){
+        for (int x=1; x<WIDTH-1; x++){
+            for (int y=1; y<HEIGHT-1; y++){
+                float avg=map[x][y];
+                for (int d=0; d<4; d++){
+                    int x1=x+getXInDir(d);
+                    int y1=y+getYInDir(d);
+                    avg+=map[x1][y1];
+                }
+                map[x][y]=avg/5f;
+            }
+        }
+    }
+
+
+    public int getXInDir(int dir){
+        if (dir==1){
+            return 1;
+        }else if (dir==3){
+            return -1;
+        }
+        return 0;
+    }
+
+    public int getYInDir(int dir){
+        if (dir==0){
+            return -1;
+        }else if (dir==2){
+            return 1;
+        }
+        return 0;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -281,6 +325,10 @@ public class Main extends Applet implements Runnable, KeyListener {
             ranges=getQuartiles();
             scaleWithBigCos();
         }
+        if (key == KeyEvent.VK_SPACE) {
+            smooth();
+        }
+
         if (key == KeyEvent.VK_D) {
             ranges=getQuartiles();
             scaleDepths();
