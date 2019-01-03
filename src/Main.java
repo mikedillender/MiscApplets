@@ -16,7 +16,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     //COLORS
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(0, 0,0);
-    int[][][] map;
+    float[][][] map;
+    float[][] stars;
 
 
 
@@ -27,7 +28,8 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
-        map=new int[128][90][3];
+        map=new float[128][90][3];
+        stars=new float[128][90];
     }
 
     public void paint(Graphics g){
@@ -52,51 +54,65 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
-            addtimer-=10;
-            movetimer-=10;
-            if (addtimer<0){
-                addtimer=0;
-                addBlock();
-                addBlock();
-                addBlock();
-                addBlock();
-                addBlock();
-                addBlock();
-                addBlock();
-            }
-            if (movetimer<0){
-                movetimer=10;
-                move();
-            }
-
+            addColor();
+            flowColor();
 
             repaint();//UPDATES FRAME
             try{ Thread.sleep(50); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
-    public void addBlock(){
-        map[(int)(Math.random()*128)][0][0]=(int)(Math.random()*255);
-        map[(int)(Math.random()*128)][0][1]=(int)(Math.random()*255);
-        map[(int)(Math.random()*128)][0][2]=(int)(Math.random()*255);
-    }
-
-    public void move(){
-        for (int x=0; x<map.length; x++){
-            for (int y=map[0].length-1; y>-1; y--){
-                if (map[x][y][0]!=0) {
-                    int[] thisTile=map[x][y];
-                    if (y<map[0].length-1) {
-                        if (map[x][y + 1][0]==0) {
-                            map[x][y] = new int[]{0,0,0};
-                            map[x][y + 1] = thisTile;
-                        }
-                    }
+    private void addColor(){
+        int bx=(int)(Math.random()*(map.length-4));
+        int by=(int)(Math.random()*(map[0].length-4));
+        int size=(int)(Math.random()*3);
+        int[] color=new int[]{
+                (int)(150*Math.random()),
+                (int)(150*Math.random()),
+                (int)(200*Math.random())
+        };
+        for (int x=bx; x<bx+size; x++){
+            for (int y=by; y<by+size; y++){
+                float amt=(float)(Math.random());
+                for (int v=0; v<3; v++){
+                    map[x][y][v]=(int)((map[x][y][v]+(amt*color[v]))/(1+amt));
                 }
             }
         }
     }
 
+    private void flowColor(){
+        for (int x=1; x<map.length-1; x++){
+            for (int y=1; y<map[0].length-1; y++){
+                for (int v=0; v<3; v++){
+                    float avg=map[x][y][v];
+                    for (int d=0; d<4; d++){
+                        avg+=map[x+getXInDir(d)][y+getYInDir(d)][v];
+                    }
+                    map[x][y][v]=(avg/5f);
+
+                }
+            }
+        }
+    }
+
+    public int getXInDir(int dir){
+        if (dir==1){
+            return 1;
+        }else if (dir==3){
+            return -1;
+        }
+        return 0;
+    }
+
+    public int getYInDir(int dir){
+        if (dir==0){
+            return -1;
+        }else if (dir==2){
+            return 1;
+        }
+        return 0;
+    }
 
     //INPUT
     public void keyPressed(KeyEvent e) {
@@ -113,10 +129,16 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                if (map[x][y][0]!=0) {
-                    gfx.setColor(new Color(map[x][y][0], map[x][y][1], map[x][y][2]));
-                    gfx.fillRect(tilesize * x, tilesize * y, tilesize, tilesize);
+                int[] c=new int[3];
+                for (int v=0; v<3; v++){
+                    int val=(int)map[x][y][v];
+                    if (val>10){
+                        val=10;
+                    }
+                    c[v]=val;
                 }
+                gfx.setColor(new Color(c[0],c[1],c[2]));
+                gfx.fillRect(tilesize * x, tilesize * y, tilesize, tilesize);
             }
         }
     }
