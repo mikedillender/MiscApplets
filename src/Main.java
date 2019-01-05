@@ -49,12 +49,12 @@ public class Main extends Applet implements Runnable, KeyListener {
         int min=((int)dt/60);
         int s=(int)(dt-(60*min));
         double percent=dt/(time*60);
-        double question=percent*(numQuestions);
+        int question=(int)(percent*(numQuestions));
         double sec=percent*numSections;
         int csec=(int)Math.floor(sec);
         int percentCSec=(int)(100*((sec-Math.floor(sec))));
-        gfx.drawString(min+" : "+s, WIDTH/5, HEIGHT/2);
-        gfx.drawString("Should be on question "+question, WIDTH/5, HEIGHT/2+50);
+        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/5, HEIGHT/2);
+        gfx.drawString("          Should be on question "+question, WIDTH/5, HEIGHT/2+50);
         gfx.drawString("Should be on section "+csec+" with "+percentCSec+"% complete", WIDTH/5, HEIGHT/2+100);
 
         g.drawImage(img,0,0,this);
