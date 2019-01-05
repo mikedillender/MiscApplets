@@ -15,9 +15,11 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     //COLORS
     Color background=new Color(255, 255, 255);
-    Color gridColor=new Color(150, 150,150);
-
-
+    Color black=new Color(0,0,0);
+    long startTime;
+    int numQuestions=40;
+    int numSections=4;
+    int time=35;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -26,18 +28,30 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+        startTime=System.nanoTime();
+        Font currentFont = gfx.getFont();
+        Font newFont = currentFont.deriveFont(currentFont.getSize() * 3F);
+        gfx.setFont(newFont);
     }
 
     public void paint(Graphics g){
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
+        gfx.setColor(black);
 
-        //RENDER FOREGROUND
-
-
-        //FINAL
+        double dt=(System.nanoTime()-startTime)/1000000000.0;
+        int min=((int)dt/60);
+        int s=(int)(dt-(60*min));
+        double percent=dt/(time*60);
+        double question=percent*(numQuestions);
+        double sec=percent*numSections;
+        int csec=(int)Math.floor(sec);
+        int percentCSec=(int)(100*((sec-Math.floor(sec))));
+        gfx.drawString(min+" : "+s, WIDTH/5, HEIGHT/2);
+        gfx.drawString("Should be on question "+question, WIDTH/5, HEIGHT/2+50);
+        gfx.drawString("Should be on section "+csec+" with "+percentCSec+"% complete", WIDTH/5, HEIGHT/2+100);
+        
         g.drawImage(img,0,0,this);
     }
 
@@ -46,35 +60,13 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
-
-            //UPDATES
-
-
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
 
-    //INPUT
-    public void keyPressed(KeyEvent e) {
-
-    }
-    public void keyReleased(KeyEvent e) {
-
-    }
+    public void keyPressed(KeyEvent e) { }
+    public void keyReleased(KeyEvent e) { }
     public void keyTyped(KeyEvent e) { }
-
-    //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
-    public void paintCoordGrid(Graphics gfx){
-        gfx.setColor(gridColor);
-        for (int x=100; x<WIDTH; x+=100){
-            gfx.drawString(""+x, x, 20);
-            gfx.drawRect(x, 20, 1, HEIGHT);
-        }
-        for (int y=100; y<HEIGHT; y+=100){
-            gfx.drawString(""+y, 20, y);
-            gfx.drawRect(20, y, WIDTH, 1);
-        }
-    }
 }
