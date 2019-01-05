@@ -21,6 +21,9 @@ public class Main extends Applet implements Runnable, KeyListener {
     int numSections=4;
     int time=35;
 
+    boolean paused=false;
+    long pauseTime=0;
+
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
@@ -35,6 +38,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void paint(Graphics g){
+        if (paused){return;}
+
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
@@ -51,7 +56,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx.drawString(min+" : "+s, WIDTH/5, HEIGHT/2);
         gfx.drawString("Should be on question "+question, WIDTH/5, HEIGHT/2+50);
         gfx.drawString("Should be on section "+csec+" with "+percentCSec+"% complete", WIDTH/5, HEIGHT/2+100);
-        
+
         g.drawImage(img,0,0,this);
     }
 
@@ -60,13 +65,20 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
-            repaint();//UPDATES FRAME
-            try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
-            catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
+        repaint();//UPDATES FRAME
+        try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
+        catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
 
 
-    public void keyPressed(KeyEvent e) { }
+    public void keyPressed(KeyEvent e) {
+        if (!paused){
+            pauseTime=System.nanoTime();
+        }else {
+            startTime=startTime+(System.nanoTime()-pauseTime);
+        }
+        paused=!paused;
+    }
     public void keyReleased(KeyEvent e) { }
     public void keyTyped(KeyEvent e) { }
 }
