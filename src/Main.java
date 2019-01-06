@@ -16,6 +16,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     //COLORS
     Color background=new Color(255, 255, 255);
     Color black=new Color(0,0,0);
+    Color progressBar=new Color(120,120,120);
     long startTime;
     int numQuestions=40;
     int numSections=4;
@@ -49,22 +50,26 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         double dt=(System.nanoTime()-startTime)/1000000000.0;
         int min=((int)dt/60);
-        int s=(int)(dt-(60*min));
+        double s=(int)(10*(dt-(60*min)))/10.0;
         double percent=dt/(time*60);
         int question=(int)(percent*(numQuestions));
         double sec=percent*numSections;
         int csec=(int)Math.floor(sec)+1;
         double percentCSec=(100*((sec-Math.floor(sec))));
-        
-        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/4, HEIGHT/2);
-        gfx.drawString("          Should be on question "+question, WIDTH/4, HEIGHT/2+50);
-        gfx.drawString("Should be on section "+csec+" with "+(int)percentCSec+"% complete", WIDTH/4, HEIGHT/2+100);
-        gfx.drawRect(WIDTH/5, HEIGHT/2+150,WIDTH/5*3,40);
-        gfx.drawRect(WIDTH/5, HEIGHT/2+150,(int)((pacing[0]/8.75)*(WIDTH/5*3)),40);
-        gfx.drawRect(WIDTH/5, HEIGHT/2+150,(int)((pacing[1]/8.75)*(WIDTH/5*3)),40);
-        gfx.fillRect(WIDTH/5, HEIGHT/2+150,(int)((percentCSec/100.0)*(WIDTH/5*3)),40);
-        gfx.drawRect(WIDTH/5, HEIGHT/2+200,WIDTH/5*3,40);
-        gfx.fillRect(WIDTH/5, HEIGHT/2+200,(int)((dt/(time*60.0))*(WIDTH/5*3)),40);
+
+        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/4, HEIGHT/3);
+        gfx.drawString("          Should be on question "+question, WIDTH/4, HEIGHT/3+50);
+        gfx.drawString("Should be on section "+csec+" with "+(int)percentCSec+"% complete", WIDTH/4, HEIGHT/3+100);
+
+        gfx.setColor(progressBar);
+        gfx.fillRect(WIDTH/5, HEIGHT/3+200,(int)((dt/(time*60.0))*(WIDTH/5*3)),40);
+        gfx.fillRect(WIDTH/5, HEIGHT/3+150,(int)((percentCSec/100.0)*(WIDTH/5*3)),40);
+
+        gfx.setColor(black);
+        gfx.drawRect(WIDTH/5, HEIGHT/3+150,WIDTH/5*3,40);
+        gfx.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[0]/8.75)*(WIDTH/5*3)),40);
+        gfx.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[1]/8.75)*(WIDTH/5*3)),40);
+        gfx.drawRect(WIDTH/5, HEIGHT/3+200,WIDTH/5*3,40);
 
 
 
