@@ -21,6 +21,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     int numSections=4;
     int time=35;
 
+    double[] pacing=new double[]{.61,3.05};
+
     boolean paused=false;
     long pauseTime=0;
 
@@ -51,11 +53,20 @@ public class Main extends Applet implements Runnable, KeyListener {
         double percent=dt/(time*60);
         int question=(int)(percent*(numQuestions));
         double sec=percent*numSections;
-        int csec=(int)Math.floor(sec);
-        int percentCSec=(int)(100*((sec-Math.floor(sec))));
-        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/5, HEIGHT/2);
-        gfx.drawString("          Should be on question "+question, WIDTH/5, HEIGHT/2+50);
-        gfx.drawString("Should be on section "+csec+" with "+percentCSec+"% complete", WIDTH/5, HEIGHT/2+100);
+        int csec=(int)Math.floor(sec)+1;
+        double percentCSec=(100*((sec-Math.floor(sec))));
+        
+        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/4, HEIGHT/2);
+        gfx.drawString("          Should be on question "+question, WIDTH/4, HEIGHT/2+50);
+        gfx.drawString("Should be on section "+csec+" with "+(int)percentCSec+"% complete", WIDTH/4, HEIGHT/2+100);
+        gfx.drawRect(WIDTH/5, HEIGHT/2+150,WIDTH/5*3,40);
+        gfx.drawRect(WIDTH/5, HEIGHT/2+150,(int)((pacing[0]/8.75)*(WIDTH/5*3)),40);
+        gfx.drawRect(WIDTH/5, HEIGHT/2+150,(int)((pacing[1]/8.75)*(WIDTH/5*3)),40);
+        gfx.fillRect(WIDTH/5, HEIGHT/2+150,(int)((percentCSec/100.0)*(WIDTH/5*3)),40);
+        gfx.drawRect(WIDTH/5, HEIGHT/2+200,WIDTH/5*3,40);
+        gfx.fillRect(WIDTH/5, HEIGHT/2+200,(int)((dt/(time*60.0))*(WIDTH/5*3)),40);
+
+
 
         g.drawImage(img,0,0,this);
     }
