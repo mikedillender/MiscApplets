@@ -52,13 +52,12 @@ public class Main extends Applet implements Runnable, KeyListener {
         int min=((int)dt/60);
         double s=(int)(10*(dt-(60*min)))/10.0;
         double percent=dt/(time*60);
-        int question=(int)(percent*(numQuestions));
+        int question=(int)(percent*numQuestions);
         double sec=percent*numSections;
         int csec=(int)Math.floor(sec)+1;
         double percentCSec=(100*((sec-Math.floor(sec))));
 
-        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/4, HEIGHT/3);
-        gfx.drawString("          Should be on question "+question, WIDTH/4, HEIGHT/3+50);
+        gfx.drawString("                  Time = "+min+" : "+s, WIDTH/4, HEIGHT/3+50);
         gfx.drawString("Should be on section "+csec+" with "+(int)percentCSec+"% complete", WIDTH/4, HEIGHT/3+100);
 
         gfx.setColor(progressBar);
