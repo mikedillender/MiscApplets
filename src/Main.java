@@ -65,15 +65,22 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx.fillRect(WIDTH/5, HEIGHT/3+200,(int)((dt/(time*60.0))*(WIDTH/5*3)),40);
         gfx.fillRect(WIDTH/5, HEIGHT/3+150,(int)((percentCSec/100.0)*(WIDTH/5*3)),40);
 
-        gfx.setColor(black);
-        gfx.drawRect(WIDTH/5, HEIGHT/3+150,WIDTH/5*3,40);
-        gfx.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[0]/8.75)*(WIDTH/5*3)),40);
-        gfx.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[1]/8.75)*(WIDTH/5*3)),40);
-        gfx.drawRect(WIDTH/5, HEIGHT/3+200,WIDTH/5*3,40);
+        renderBars(gfx);
 
 
 
         g.drawImage(img,0,0,this);
+    }
+
+    public void renderBars(Graphics g){
+        g.setColor(black);
+        g.drawRect(WIDTH/5, HEIGHT/3+150,WIDTH/5*3,40);
+        g.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[0]/8.75)*(WIDTH/5*3)),40);
+        g.drawRect(WIDTH/5, HEIGHT/3+150,(int)((pacing[1]/8.75)*(WIDTH/5*3)),40);
+        g.drawRect(WIDTH/5, HEIGHT/3+200,WIDTH/5*3,40);
+        for (int i=1; i<4; i++){
+            g.drawRect(WIDTH/5, HEIGHT/3+200,(int)((i/4.0)*(WIDTH/5*3)),40);
+        }
     }
 
     public void update(Graphics g){ //REDRAWS FRAME
