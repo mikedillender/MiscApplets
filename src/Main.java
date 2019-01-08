@@ -10,9 +10,9 @@ import java.io.IOException;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int size=5;
+    private final int size=10;
     private int sWIDTH=1280, sHEIGHT=900;
-    private final int WIDTH=sWIDTH/size, HEIGHT=sHEIGHT/size;
+    private int WIDTH=sWIDTH/size, HEIGHT=sHEIGHT/size;
     boolean blackAndWhite=true;
 
 
@@ -94,9 +94,9 @@ public class Main extends Applet implements Runnable, KeyListener {
             //addColor();
             spread();
         }
-        for (int i=0; i<smoothspeed; i++) {
+        //for (int i=0; i<smoothspeed; i++) {
             smooth();
-        }
+        //}
         for (int i=0; i<movespeed; i++) {
             moveF();
         }
@@ -114,7 +114,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void importImg(){
         BufferedImage img = null;
         try {
-            img = ImageIO.read(new File("C:\\Users\\Mike\\Pictures\\img4.png"));
+            img = ImageIO.read(new File("C:\\Users\\Mike\\Pictures\\tree.png"));
         } catch (IOException e) {
         }
         for (int x1=0; x1<img.getWidth(); x1++){
@@ -234,7 +234,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         return false;
     }
     public void smooth(){
-        float w=.001f;
+        float w=smoothweight;
         float[][][] map2=new float[WIDTH][HEIGHT][3];
         for (int x=1; x<WIDTH-1; x++){
             for (int y=1; y<HEIGHT-1; y++){
@@ -279,9 +279,12 @@ public class Main extends Applet implements Runnable, KeyListener {
         }else if (e.getKeyCode()==KeyEvent.VK_UP) {
             speed++;
         }else if (e.getKeyCode()==KeyEvent.VK_RIGHT){
-            smoothspeed++;
+            //smoothspeed++;
+            smoothweight+=.01;
         }else if (e.getKeyCode()==KeyEvent.VK_LEFT) {
-            smoothspeed--;
+//            smoothspeed--;
+            smoothweight-=.01;
+
         }else if (e.getKeyCode()==KeyEvent.VK_MINUS){
             movespeed--;
         }else if (e.getKeyCode()==KeyEvent.VK_EQUALS) {
@@ -304,11 +307,15 @@ public class Main extends Applet implements Runnable, KeyListener {
             importImg();
         }
 
-        System.out.println("speed = "+speed+", smooth = "+smoothspeed+", movespeed = "+movespeed);
+        if (smoothweight<0){
+            smoothweight=0;
+        }
+        System.out.println("speed = "+speed+", smooth = "+smoothspeed+", movespeed = "+movespeed+", smoothweight = "+smoothweight);
     }
     public void keyReleased(KeyEvent e) {
 
     }
+    private float smoothweight=0;
     public void keyTyped(KeyEvent e) { }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
