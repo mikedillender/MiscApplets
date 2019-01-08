@@ -10,8 +10,8 @@ import java.io.IOException;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int size=10;
-    private int sWIDTH=1280, sHEIGHT=900;
+    private final int size=2;
+    private int sWIDTH=1500, sHEIGHT=850;
     private int WIDTH=sWIDTH/size, HEIGHT=sHEIGHT/size;
     boolean blackAndWhite=true;
 
@@ -85,24 +85,29 @@ public class Main extends Applet implements Runnable, KeyListener {
         paint(g);
     }
 
-    int addtimer=100;
-    int movetimer=20;
+    boolean colorAdd=false;
+
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
+
         for (int i=0; i<speed; i++) {
-            //addColor();
+            if (i<movespeed){
+                moveF();
+            }
+            if (colorAdd) {
+                addColor();
+            }
             spread();
         }
-        //for (int i=0; i<smoothspeed; i++) {
-            smooth();
-        //}
-        for (int i=0; i<movespeed; i++) {
+
+        smooth();
+
+        for (int i=0; i<movespeed-speed; i++) {
             moveF();
         }
 
         //smooth();
-
 
         repaint();//UPDATES FRAME
         try{ Thread.sleep(50); } //ADDS TIME BETWEEN FRAMES (FPS)
@@ -128,7 +133,9 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void addColor(){
+        int maxRange=100;
         int range=(HEIGHT/5);
+        if (range>maxRange){range=maxRange;}
 
         //int x=(int)(Math.random()*(ex-sx))+sx;
         //int y=(int)(Math.random()*(ey-sy))+sy;
@@ -193,22 +200,7 @@ public class Main extends Applet implements Runnable, KeyListener {
                     }
                 }
             }
-        }/*
-        for (int x=0; x<WIDTH; x++){
-            for (int y=0; y<HEIGHT; y++){
-                for (int d=0; d<4; d++){
-                    int x1=x+getXInDir(d);
-                    int y1=y+getYInDir(d);
-                    if (isValid(x1,y1)){
-                        if (Math.random()<.001*(getAvgAt(x,y))){
-                            if (getAvgAt(x,y)>getAvgAt(x1,y1)){
-                                map[x1][y1]=map[x][y];
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
+        }
     }
 
     public float getAvgAt(int x, int y){
@@ -305,6 +297,29 @@ public class Main extends Applet implements Runnable, KeyListener {
             blackAndWhite=!blackAndWhite;
         } else if (e.getKeyCode()==KeyEvent.VK_I){
             importImg();
+        }else if (e.getKeyCode()==KeyEvent.VK_A){
+            colorAdd=!colorAdd;
+        }else if( e.getKeyCode()==KeyEvent.VK_F){
+            for (int x=0; x<WIDTH; x++){
+                for (int y=0; y<HEIGHT; y++){
+                    for (int v=0; v<3; v++){
+                        map[x][y][v]=(int)(Math.random()*255);
+                    }
+                }
+            }
+        }else if( e.getKeyCode()==KeyEvent.VK_L){
+            double p=100.0/(WIDTH*HEIGHT);
+            for (int x=0; x<WIDTH; x++){
+                for (int y=0; y<HEIGHT; y++){
+                    if (Math.random()<p) {
+                        for (int v = 0; v < 3; v++) {
+                            map[x][y][v] = (int) (Math.random() * 255);
+                        }
+                    }else {
+                        map[x][y]=new float[]{0,0,0};
+                    }
+                }
+            }
         }
 
         if (smoothweight<0){
