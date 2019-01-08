@@ -1,7 +1,11 @@
+import javax.imageio.ImageIO;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
@@ -9,6 +13,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     private final int size=5;
     private int sWIDTH=1280, sHEIGHT=900;
     private final int WIDTH=sWIDTH/size, HEIGHT=sHEIGHT/size;
+    boolean blackAndWhite=true;
+
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -19,9 +25,9 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(0, 0,0);
     float[][][] map;
-    int speed=1;
-    int smoothspeed=1;
-    int movespeed=1;
+    int speed=0;
+    int smoothspeed=0;
+    int movespeed=0;
     float fx,fy;
     float vx=0,vy=0;
 
@@ -85,7 +91,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
             //UPDATES
         for (int i=0; i<speed; i++) {
-            addColor();
+            //addColor();
             spread();
         }
         for (int i=0; i<smoothspeed; i++) {
@@ -105,6 +111,21 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
 
+    public void importImg(){
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("C:\\Users\\Mike\\Pictures\\img4.png"));
+        } catch (IOException e) {
+        }
+        for (int x1=0; x1<img.getWidth(); x1++){
+            int x=(int)(((float)x1/img.getWidth())*WIDTH);
+            for (int y1=0; y1<img.getHeight(); y1++){
+                int y=(int)(((float)y1/img.getHeight())*HEIGHT);
+                Color c=new Color(img.getRGB(x1,y1));
+                map[x][y]=new float[]{255-c.getRed(),255-c.getGreen(),255-c.getBlue()};
+            }
+        }
+    }
 
     public void addColor(){
         int range=(HEIGHT/5);
@@ -132,6 +153,29 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     }
 
+
+    public void addTree(int x, int y){
+        int w=(int)(Math.ceil(Math.random()*3));
+        int h=(int)(w*Math.random()*8);
+        float[] bark=new float[]{147, 138, 109};
+
+        for (int x1=x; x1<x+w; x1++){
+            for (int y1=y; y1<y+h+5; y1++){
+                if (isValid(x1,y1)) {
+                    map[x1][y1] = bark;
+                }
+            }
+        }
+        float[] c=new float[]{255-(float)(Math.random()*100),255-(float)(Math.random()*150)-100,255-(float)(Math.random()*100)};
+        for (int y1=y; y1<y+h; y1++){
+            int var=-1+(int)Math.round(Math.random()*2);
+            for (int x1=x-(y1-y)-1; x1<x+(y1-y)+1; x1++){
+                if (isValid(x1+var,y1)) {
+                    map[x1 + var][y1] = c;
+                }
+            }
+        }
+    }
 
     public void spread(){
 
@@ -243,6 +287,12 @@ public class Main extends Applet implements Runnable, KeyListener {
                     }
                 }
             }
+        }else if (e.getKeyCode()==KeyEvent.VK_T){
+            addTree((int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT));
+        }else if (e.getKeyCode()==KeyEvent.VK_C){
+            blackAndWhite=!blackAndWhite;
+        } else if (e.getKeyCode()==KeyEvent.VK_I){
+            importImg();
         }
 
         System.out.println("speed = "+speed+", smooth = "+smoothspeed+", movespeed = "+movespeed);
@@ -254,7 +304,6 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
     public void paintCoordGrid(Graphics gfx1){
-        boolean blackAndWhite=true;
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
                     if (blackAndWhite){
