@@ -218,6 +218,13 @@ public class Main extends Applet implements Runnable, KeyListener {
         }
         return sum/3f;
     }
+    public float getAvgAt(int x, int y, float[][][] map){
+        float sum=0;
+        for (int v=0; v<3; v++){
+            sum+=map[x][y][v];
+        }
+        return sum/3f;
+    }
     private boolean isValid(int x, int y){
         if (x>0&&y>0){
             if (x<WIDTH&&y<HEIGHT){
@@ -227,7 +234,8 @@ public class Main extends Applet implements Runnable, KeyListener {
         return false;
     }
     public void smooth(){
-        float w=.3f;
+        float w=.001f;
+        float[][][] map2=new float[WIDTH][HEIGHT][3];
         for (int x=1; x<WIDTH-1; x++){
             for (int y=1; y<HEIGHT-1; y++){
                 for (int v=0; v<3; v++) {
@@ -237,10 +245,11 @@ public class Main extends Applet implements Runnable, KeyListener {
                         int y1 = y + getYInDir(d);
                         avg += map[x1][y1][v];
                     }
-                    map[x][y][v] = ((w*(avg / 5f)+(map[x][y][v]))/(1+w));
+                    map2[x][y][v] = ((w*(avg / 5f)+(map[x][y][v]))/(1+w));
                 }
             }
         }
+        map=map2;
     }
 
     public int getXInDir(int dir){
