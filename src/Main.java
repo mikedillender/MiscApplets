@@ -2,6 +2,8 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
@@ -17,6 +19,10 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(150, 150,150);
 
+    float a=.15f;
+    float b=.40f;
+
+    ArrayList<float[]> arms;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -32,13 +38,17 @@ public class Main extends Applet implements Runnable, KeyListener {
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
+        renderStructure(gfx);
 
         //RENDER FOREGROUND
 
 
         //FINAL
         g.drawImage(img,0,0,this);
+    }
+
+    public void renderStructure(Graphics gfx){
+
     }
 
     public void update(Graphics g){ //REDRAWS FRAME
@@ -65,16 +75,5 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
     public void keyTyped(KeyEvent e) { }
 
-    //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
-    public void paintCoordGrid(Graphics gfx){
-        gfx.setColor(gridColor);
-        for (int x=100; x<WIDTH; x+=100){
-            gfx.drawString(""+x, x, 20);
-            gfx.drawRect(x, 20, 1, HEIGHT);
-        }
-        for (int y=100; y<HEIGHT; y+=100){
-            gfx.drawString(""+y, 20, y);
-            gfx.drawRect(20, y, WIDTH, 1);
-        }
-    }
+
 }
