@@ -19,16 +19,24 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(150, 150,150);
 
-    float a=.15f;
-    float b=.40f;
 
-    ArrayList<float[]> arms;
+    float scale=(WIDTH+HEIGHT)/2f;
+
+    ArrayList<Arm> arms;
 
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
+        arms=new ArrayList<>();
+        arms.add(new Arm(.1f,.25f, 0,.4f));
+        arms.add(new Arm(.1f,.25f, (float)Math.PI/2f+(float)Math.PI,.15f));
+        arms.get(0).addArm(arms.get(1),.0f);
+        arms.get(1).addArm(arms.get(0),.0f);
+        arms.add(new Arm(arms.get(1),arms.get(0),arms.get(1).length,arms.get(0).length));
+        arms.add(new Arm(arms.get(0),arms.get(2),arms.get(0).length*(float)Math.random(),arms.get(2).length*(float)Math.random()));
         img=createImage(WIDTH,HEIGHT);
+        arms.get(2).addTorque(arms.get(2).length, 100f, 0);
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
@@ -48,7 +56,10 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void renderStructure(Graphics gfx){
-
+        gfx.setColor(Color.BLACK);
+        for (int i=0; i<arms.size(); i++){
+            arms.get(i).render(gfx,1000);
+        }
     }
 
     public void update(Graphics g){ //REDRAWS FRAME
