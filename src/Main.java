@@ -2,6 +2,7 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
@@ -18,19 +19,15 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color sprite=new Color(0,0,0);
     Color gridColor=new Color(150, 150,150);
 
-    //"CHARACTER"
-    int sx=WIDTH/2;
-    int sy=HEIGHT/2;
+    ArrayList<body> b;
+    int mode=0;
 
-    //CONTROLS
-    boolean pressingW;
-    boolean pressingA;
-    boolean pressingS;
-    boolean pressingD;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
+        b=new ArrayList<>();
+
         img=createImage(WIDTH,HEIGHT);
         gfx=img.getGraphics();
         thread=new Thread(this);
@@ -41,35 +38,53 @@ public class Main extends Applet implements Runnable, KeyListener {
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
 
         //RENDER FOREGROUND
         gfx.setColor(sprite);
-        gfx.fillRect(sx, sy, 10, 10);
+        for (int i=0; i<b.size(); i++){
+            b.get(i).draw(gfx);
+        }
 
         //FINAL
         g.drawImage(img,0,0,this);
     }
 
+    private void addBody(){
+        b.add(new body((int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT), (-1+(2*Math.random()))*.00001,(-1+(2*Math.random()))*.00001, (float)(Math.random()*5)+1));
+    }
+
     public void update(Graphics g){ //REDRAWS FRAME
         paint(g);
+        for (int i=0; i<b.size(); i++){
+            b.get(i).update(b);
+        }
+        for (body i:b){
+            for (body z: b){
+                if (z!=i){
+                    if (i.isSurroundingB(z)){
+                        if (mode==1) {
+                            i.mass = (float) (Math.sqrt(Math.pow(i.mass, 2) + Math.pow(z.mass, 2)));
+                            i.vx = (i.vx * i.mass + z.vx * z.mass) / (i.mass + z.mass);
+                            i.vy = (i.vy * i.mass + z.vy * z.mass) / (i.mass + z.mass);
+                            b.remove(z);
+                        }else if (mode==2){
+                            float energyGain=1.1f;
+                            float vx1=i.vx,vy1=i.vy;
+                            i.vy=energyGain*(z.vy*z.mass)/i.mass;
+                            i.vx=energyGain*(z.vx*z.mass)/i.mass;
+                            z.vy=energyGain*(vy1*z.mass)/i.mass;
+                            z.vx=energyGain*(vx1*z.mass)/i.mass;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
-            if (pressingW){
-                sy=sy-1;
-            }
-            if (pressingS){
-                sy=sy+1;
-            }
-            if (pressingA){
-                sx=sx-1;
-            }
-            if (pressingD){
-                sx=sx+1;
-            }
+
 
             repaint();//UPDATES FRAME
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
@@ -78,31 +93,22 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     //INPUT
-    public void keyPressed(KeyEvent e) { updateControls(e, true); }
-    public void keyReleased(KeyEvent e) { updateControls(e, false); }
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode()==KeyEvent.VK_R){
+            b=new ArrayList<>();
+        }
+        if (e.getKeyCode()==KeyEvent.VK_0){
+            mode=0;
+        }else if (e.getKeyCode()==KeyEvent.VK_1){
+            mode=1;
+        }else if (e.getKeyCode()==KeyEvent.VK_2){
+            mode=2;
+        }
+        addBody();
+    }
+    public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) { }
     public void updateControls(KeyEvent e, boolean pressed){
-        if (e.getKeyCode()==KeyEvent.VK_W){
-            pressingW=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_A){
-            pressingA=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_S){
-            pressingS=pressed;
-        }else if (e.getKeyCode()==KeyEvent.VK_D){
-            pressingD=pressed;
-        }
     }
 
-    //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
-    public void paintCoordGrid(Graphics gfx){
-        gfx.setColor(gridColor);
-        for (int x=100; x<WIDTH; x+=100){
-            gfx.drawString(""+x, x, 20);
-            gfx.drawRect(x, 20, 1, HEIGHT);
-        }
-        for (int y=100; y<HEIGHT; y+=100){
-            gfx.drawString(""+y, 20, y);
-            gfx.drawRect(20, y, WIDTH, 1);
-        }
-    }
 }
