@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int size=2;
+    private final int size=5;
     private int sWIDTH=1500, sHEIGHT=850;
     private int WIDTH=sWIDTH/size, HEIGHT=sHEIGHT/size;
     boolean blackAndWhite=true;
@@ -20,11 +20,12 @@ public class Main extends Applet implements Runnable, KeyListener {
     private Thread thread;
     Graphics gfx;
     Image img;
+    long start=System.nanoTime();
 
     //COLORS
-    Color background=new Color(255, 255, 255);
-    Color gridColor=new Color(0, 0,0);
-    float[][][] map;
+    Color yes=Color.BLACK;
+    Color no=Color.WHITE;
+    boolean[][] map;
     int speed=0;
     int smoothspeed=0;
     int movespeed=0;
@@ -36,7 +37,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         this.addKeyListener(this);
         img=createImage(sWIDTH,sHEIGHT);
         gfx=img.getGraphics();
-        map=new float[WIDTH][HEIGHT][3];
+        map=new boolean[WIDTH][HEIGHT];
         fx=WIDTH/2;
         fy=HEIGHT/2;
         thread=new Thread(this);
@@ -70,7 +71,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void paint(Graphics g){
         //BACKGROUND
-        gfx.setColor(background);//background
+        gfx.setColor(Color.white);//background
         gfx.fillRect(0,0,sWIDTH,sHEIGHT);//background size
         paintCoordGrid(gfx);
 
@@ -92,20 +93,15 @@ public class Main extends Applet implements Runnable, KeyListener {
             //UPDATES
 
         for (int i=0; i<speed; i++) {
-            if (i<movespeed){
-                moveF();
-            }
-            if (colorAdd) {
+            if (Math.random()<.1) {
                 addColor();
             }
             spread();
         }
 
-        smooth();
+        chance= .3f+(float) (.4f*.5f*(1+Math.sin((System.nanoTime()-start)/1000000000.0f/3)));
 
-        for (int i=0; i<movespeed-speed; i++) {
-            moveF();
-        }
+
 
         //smooth();
 
@@ -116,73 +112,15 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
 
-    public void importImg(){
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(new File("C:\\Users\\Mike\\Pictures\\tree.png"));
-        } catch (IOException e) {
-        }
-        for (int x1=0; x1<img.getWidth(); x1++){
-            int x=(int)(((float)x1/img.getWidth())*WIDTH);
-            for (int y1=0; y1<img.getHeight(); y1++){
-                int y=(int)(((float)y1/img.getHeight())*HEIGHT);
-                Color c=new Color(img.getRGB(x1,y1));
-                map[x][y]=new float[]{255-c.getRed(),255-c.getGreen(),255-c.getBlue()};
-            }
-        }
-    }
-
     public void addColor(){
-        int maxRange=100;
-        int range=(HEIGHT/5);
-        if (range>maxRange){range=maxRange;}
 
-        //int x=(int)(Math.random()*(ex-sx))+sx;
-        //int y=(int)(Math.random()*(ey-sy))+sy;
-        int x=(int)fx+(int)(Math.random()*(-range+(2*Math.random()*range)));
-        int y=(int)fy+(int)(Math.random()*(-range+(2*Math.random()*range)));
-
-        if (!isValid(x,y)){return;}
-        //int x=(int)(Math.random()*WIDTH)/2;
-        //int y=(int)(Math.random()*HEIGHT)/2;
-        int w=(int)(Math.random()*5);
-        int h=(int)(Math.random()*5);
-        for (int v=0; v<3; v++) {
-            map[x][y][v]=(float)(Math.random()*255);
-        }
-        for (int x1=x; x1<x+w; x1++){
-            for (int y1=y; y1<y+h; y1++) {
-                if (isValid(x1,y1)) {
-                    map[x1][y1] = map[x][y];
-                }
-            }
-        }
+        int x=(int)(WIDTH*Math.random());
+        int y=(int)(HEIGHT*Math.random());
+        map[x][y]=!map[x][y];
 
     }
 
-
-    public void addTree(int x, int y){
-        int w=(int)(Math.ceil(Math.random()*3));
-        int h=(int)(w*Math.random()*8);
-        float[] bark=new float[]{147, 138, 109};
-
-        for (int x1=x; x1<x+w; x1++){
-            for (int y1=y; y1<y+h+5; y1++){
-                if (isValid(x1,y1)) {
-                    map[x1][y1] = bark;
-                }
-            }
-        }
-        float[] c=new float[]{255-(float)(Math.random()*100),255-(float)(Math.random()*150)-100,255-(float)(Math.random()*100)};
-        for (int y1=y; y1<y+h; y1++){
-            int var=-1+(int)Math.round(Math.random()*2);
-            for (int x1=x-(y1-y)-1; x1<x+(y1-y)+1; x1++){
-                if (isValid(x1+var,y1)) {
-                    map[x1 + var][y1] = c;
-                }
-            }
-        }
-    }
+    float chance=0;
 
     public void spread(){
 
@@ -192,31 +130,15 @@ public class Main extends Applet implements Runnable, KeyListener {
             for (int d=0; d<4; d++){
                 int x1=x+getXInDir(d);
                 int y1=y+getYInDir(d);
-                if (isValid(x1,y1)){
-                    if (Math.random()<.01*(getAvgAt(x,y))){
-                        //if (getAvgAt(x,y)>getAvgAt(x1,y1)){
-                            map[x1][y1]=map[x][y];
-                        //}
+                if ((map[x][y]&&Math.random()<chance)||(!map[x][y]&&Math.random()>chance)) {
+                    if (isValid(x1, y1)) {
+                        map[x1][y1] = map[x][y];
                     }
                 }
             }
         }
     }
 
-    public float getAvgAt(int x, int y){
-        float sum=0;
-        for (int v=0; v<3; v++){
-            sum+=map[x][y][v];
-        }
-        return sum/3f;
-    }
-    public float getAvgAt(int x, int y, float[][][] map){
-        float sum=0;
-        for (int v=0; v<3; v++){
-            sum+=map[x][y][v];
-        }
-        return sum/3f;
-    }
     private boolean isValid(int x, int y){
         if (x>0&&y>0){
             if (x<WIDTH&&y<HEIGHT){
@@ -224,24 +146,6 @@ public class Main extends Applet implements Runnable, KeyListener {
             }
         }
         return false;
-    }
-    public void smooth(){
-        float w=smoothweight;
-        float[][][] map2=new float[WIDTH][HEIGHT][3];
-        for (int x=1; x<WIDTH-1; x++){
-            for (int y=1; y<HEIGHT-1; y++){
-                for (int v=0; v<3; v++) {
-                    float avg = map[x][y][v];
-                    for (int d = 0; d < 4; d++) {
-                        int x1 = x + getXInDir(d);
-                        int y1 = y + getYInDir(d);
-                        avg += map[x1][y1][v];
-                    }
-                    map2[x][y][v] = ((w*(avg / 5f)+(map[x][y][v]))/(1+w));
-                }
-            }
-        }
-        map=map2;
     }
 
     public int getXInDir(int dir){
@@ -270,62 +174,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             speed--;
         }else if (e.getKeyCode()==KeyEvent.VK_UP) {
             speed++;
-        }else if (e.getKeyCode()==KeyEvent.VK_RIGHT){
-            //smoothspeed++;
-            smoothweight+=.01;
-        }else if (e.getKeyCode()==KeyEvent.VK_LEFT) {
-//            smoothspeed--;
-            smoothweight-=.01;
-
-        }else if (e.getKeyCode()==KeyEvent.VK_MINUS){
-            movespeed--;
-        }else if (e.getKeyCode()==KeyEvent.VK_EQUALS) {
-            movespeed++;
-        }else if (e.getKeyCode()==KeyEvent.VK_R) {
-            System.out.println("reset");
-            map=new float[WIDTH][HEIGHT][3];
-            for (int x=0; x<WIDTH; x++){
-                for (int y=0; y<HEIGHT; y++){
-                    for (int v=0; v<3; v++) {
-                        map[x][y][v] = 0;
-                    }
-                }
-            }
-        }else if (e.getKeyCode()==KeyEvent.VK_T){
-            addTree((int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT));
-        }else if (e.getKeyCode()==KeyEvent.VK_C){
-            blackAndWhite=!blackAndWhite;
-        } else if (e.getKeyCode()==KeyEvent.VK_I){
-            importImg();
-        }else if (e.getKeyCode()==KeyEvent.VK_A){
-            colorAdd=!colorAdd;
-        }else if( e.getKeyCode()==KeyEvent.VK_F){
-            for (int x=0; x<WIDTH; x++){
-                for (int y=0; y<HEIGHT; y++){
-                    for (int v=0; v<3; v++){
-                        map[x][y][v]=(int)(Math.random()*255);
-                    }
-                }
-            }
-        }else if( e.getKeyCode()==KeyEvent.VK_L){
-            double p=100.0/(WIDTH*HEIGHT);
-            for (int x=0; x<WIDTH; x++){
-                for (int y=0; y<HEIGHT; y++){
-                    if (Math.random()<p) {
-                        for (int v = 0; v < 3; v++) {
-                            map[x][y][v] = (int) (Math.random() * 255);
-                        }
-                    }else {
-                        map[x][y]=new float[]{0,0,0};
-                    }
-                }
-            }
         }
-
-        if (smoothweight<0){
-            smoothweight=0;
-        }
-        System.out.println("speed = "+speed+", smooth = "+smoothspeed+", movespeed = "+movespeed+", smoothweight = "+smoothweight);
     }
     public void keyReleased(KeyEvent e) {
 
@@ -337,16 +186,9 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void paintCoordGrid(Graphics gfx1){
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                    if (blackAndWhite){
-                        float avg=255-getAvgAt(x,y);
-                        //if (avg!=0) {
-                           //gfx1.setColor(new Color(0, 0, 0, (avg / 255f)));
-                        //}
-                        gfx1.setColor(new Color((int)(avg),(int)(avg),(int)(avg)));
-                    }else {
-                        gfx1.setColor(new Color((int)(255-map[x][y][0]), (int)(255-map[x][y][1]), (int)(255-map[x][y][2])));
-                    }
-                    gfx1.fillRect(x *size,  y*size, size, size);
+
+                gfx.setColor((map[x][y])?no:yes);
+                gfx1.fillRect(x *size,  y*size, size, size);
 
             }
         }
