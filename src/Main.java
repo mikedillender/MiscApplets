@@ -37,7 +37,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void change(){
         for (int x=0; x<points; x++){
-            float change=(float)(Math.random()*4)-2;
+            float change=(float)(Math.random()*10)-5;
             world[x]+=change;
         }
     }
@@ -88,11 +88,21 @@ public class Main extends Applet implements Runnable, KeyListener {
                 float o=((float)i/points)*6.28f;
                 float x=cx+(int)(world[i]*Math.cos(o));
                 float y=cy+(int)(world[i]*Math.sin(o));
+                //g.fillRect((int)x,(int)y,5,5);
                 p.add(new int[]{(int)x,(int)y});
         }
         for (int i=0; i<p.size()-1; i++){
             g.drawLine(p.get(i)[0],p.get(i)[1],p.get(i+1)[0],p.get(i+1)[1]);
+            int[] px=new int[]{p.get(i)[0],p.get(i+1)[0],cx};
+            int[] py=new int[]{p.get(i)[1],p.get(i+1)[1],cy};
+
+            g.fillPolygon(px,py,px.length);
         }
+        int[] px=new int[]{p.get(0)[0],p.get(p.size()-1)[0],cx};
+        int[] py=new int[]{p.get(0)[1],p.get(p.size()-1)[1],cy};
+
+        g.fillPolygon(px,py,px.length);
+
         g.drawLine(p.get(0)[0],p.get(0)[1],p.get(p.size()-1)[0],p.get(p.size()-1)[1]);
 
     }
