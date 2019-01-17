@@ -35,18 +35,23 @@ public class body {
                     vy = -vy*efficiency;
                 }
             }
-            body z = m.doesCollide(this, nx, ny);
+            body z = m.doesCollide(this, nx, y);
             if (z == null) {
                 x = nx;
+            } else {
+                float energyGain = efficiency;
+                float vx1 = vx, vy1 = vy;
+                vx = energyGain * (z.vx * z.mass) / mass;
+                z.vx = energyGain * (vx1 * mass) / z.mass;
+            }
+            z = m.doesCollide(this, x, ny);
+            if (z == null) {
                 y = ny;
             } else {
-                System.out.println("collide");
                 float energyGain = efficiency;
                 float vx1 = vx, vy1 = vy;
                 vy = energyGain * (z.vy * z.mass) / mass;
-                vx = energyGain * (z.vx * z.mass) / mass;
                 z.vy = energyGain * (vy1 * mass) / z.mass;
-                z.vx = energyGain * (vx1 * mass) / z.mass;
             }
         }else {
             x=nx;
