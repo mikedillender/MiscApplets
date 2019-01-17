@@ -18,28 +18,50 @@ public class body {
     }
 
     public void update(ArrayList<body> b, Main m){
-
+        float efficiency=1;
+        if (m.mode==4){
+            efficiency=.5f;
+        }
         float nx=x+vx;
         float ny=y+vy;
-        body z=m.doesCollide(this,nx,ny);
-        if (z==null){
+        if (m.mode!=1&&m.mode!=0) {
+            if ((Math.abs(nx - (m.WIDTH / 2)) > m.WIDTH / 4)) {
+                if (m.doesCollideWithWall(this, nx, y)) {
+                    vx = -vx*efficiency;
+                }
+            }
+            if ((Math.abs(ny - (m.HEIGHT / 2)) > m.HEIGHT / 4)) {
+                if (m.doesCollideWithWall(this, x, ny)) {
+                    vy = -vy*efficiency;
+                }
+            }
+            body z = m.doesCollide(this, nx, ny);
+            if (z == null) {
+                x = nx;
+                y = ny;
+            } else {
+                System.out.println("collide");
+                float energyGain = efficiency;
+                float vx1 = vx, vy1 = vy;
+                vy = energyGain * (z.vy * z.mass) / mass;
+                vx = energyGain * (z.vx * z.mass) / mass;
+                z.vy = energyGain * (vy1 * mass) / z.mass;
+                z.vx = energyGain * (vx1 * mass) / z.mass;
+            }
+        }else {
             x=nx;
             y=ny;
-        }else {
-            System.out.println("collide");
-            float energyGain = 1f;
-            float vx1 = vx, vy1 = vy;
-            vy = energyGain * (z.vy * z.mass) / mass;
-            vx = energyGain * (z.vx * z.mass) / mass;
-            z.vy = energyGain * (vy1 * mass) / z.mass;
-            z.vx = energyGain * (vx1 * mass) / z.mass;
         }
         size=(int)(5*mass);
 
-        for (int i=0; i<b.size(); i++){
-            if (b.get(i)!=this){
-                pullTowards(b.get(i));
+        if (m.mode!=4) {
+            for (int i = 0; i < b.size(); i++) {
+                if (b.get(i) != this) {
+                    pullTowards(b.get(i));
+                }
             }
+        }else {
+            accelDown(.045f);
         }
     }
     public void pullTowards(body b){
@@ -52,9 +74,13 @@ public class body {
     }
 
     public void accel(float x, float y){
-        //System.out.println("accelerating "+x+", "+y);
+        //System.out.println("accelerating "+x+", "+y);\
         vx+=x;
         vy+=y;
+    }
+
+    public void accelDown(float amt){
+        vy+=amt;
     }
 
     public void draw(Graphics g){

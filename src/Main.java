@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1280, HEIGHT=900;
+    final int WIDTH=1280, HEIGHT=900;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -20,8 +20,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color gridColor=new Color(150, 150,150);
 
     ArrayList<body> b;
-    int mode=3;
-
+    int mode=4;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -68,13 +67,6 @@ public class Main extends Applet implements Runnable, KeyListener {
                                 i.vx = (i.vx * i.mass + z.vx * z.mass) / (i.mass + z.mass);
                                 i.vy = (i.vy * i.mass + z.vy * z.mass) / (i.mass + z.mass);
                                 b.remove(z);
-                            } else if (mode == 2) {
-                                float energyGain = 1.1f;
-                                float vx1 = i.vx, vy1 = i.vy;
-                                i.vy = energyGain * (z.vy * z.mass) / i.mass;
-                                i.vx = energyGain * (z.vx * z.mass) / i.mass;
-                                z.vy = energyGain * (vy1 * z.mass) / i.mass;
-                                z.vx = energyGain * (vx1 * z.mass) / i.mass;
                             }
                         }
                     }
@@ -107,6 +99,18 @@ public class Main extends Applet implements Runnable, KeyListener {
         }
         return null;
     }
+
+    public boolean doesCollideWithWall(body b, float nx, float ny){
+        for (float o=0; o<6.28f; o+=(3.14f/10f)){
+            float px=nx+(float)(Math.cos(o)*(b.size/2f));
+            float py=ny+(float)(Math.sin(o)*(b.size/2f));
+            if (py>HEIGHT||py<0||px>WIDTH||px<0){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isPointInBody(float x, float y, body b){
         float dx=(float)(Math.abs(x-b.x));
         float dy=(float)(Math.abs(y-b.y));
