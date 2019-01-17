@@ -20,7 +20,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color gridColor=new Color(150, 150,150);
 
     ArrayList<body> b;
-    int mode=4;
+    int mode=3;
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -135,6 +135,10 @@ public class Main extends Applet implements Runnable, KeyListener {
             mode=1;
         }else if (e.getKeyCode()==KeyEvent.VK_2){
             mode=2;
+        }else if (e.getKeyCode()==KeyEvent.VK_3){
+            mode=3;
+        }else if (e.getKeyCode()==KeyEvent.VK_4){
+            mode=4;
         }
         addBody();
     }
