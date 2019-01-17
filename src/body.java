@@ -17,9 +17,23 @@ public class body {
 
     }
 
-    public void update(ArrayList<body> b){
-        x+=vx;
-        y+=vy;
+    public void update(ArrayList<body> b, Main m){
+
+        float nx=x+vx;
+        float ny=y+vy;
+        body z=m.doesCollide(this,nx,ny);
+        if (z==null){
+            x=nx;
+            y=ny;
+        }else {
+            System.out.println("collide");
+            float energyGain = 1f;
+            float vx1 = vx, vy1 = vy;
+            vy = energyGain * (z.vy * z.mass) / mass;
+            vx = energyGain * (z.vx * z.mass) / mass;
+            z.vy = energyGain * (vy1 * mass) / z.mass;
+            z.vx = energyGain * (vx1 * mass) / z.mass;
+        }
         size=(int)(5*mass);
 
         for (int i=0; i<b.size(); i++){
@@ -38,7 +52,7 @@ public class body {
     }
 
     public void accel(float x, float y){
-        System.out.println("accelerating "+x+", "+y);
+        //System.out.println("accelerating "+x+", "+y);
         vx+=x;
         vy+=y;
     }

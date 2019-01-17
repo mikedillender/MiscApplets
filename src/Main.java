@@ -20,7 +20,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color gridColor=new Color(150, 150,150);
 
     ArrayList<body> b;
-    int mode=0;
+    int mode=3;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -56,24 +56,26 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void update(Graphics g){ //REDRAWS FRAME
         paint(g);
         for (int i=0; i<b.size(); i++){
-            b.get(i).update(b);
+            b.get(i).update(b, this);
         }
-        for (body i:b){
-            for (body z: b){
-                if (z!=i){
-                    if (i.isSurroundingB(z)){
-                        if (mode==1) {
-                            i.mass = (float) (Math.sqrt(Math.pow(i.mass, 2) + Math.pow(z.mass, 2)));
-                            i.vx = (i.vx * i.mass + z.vx * z.mass) / (i.mass + z.mass);
-                            i.vy = (i.vy * i.mass + z.vy * z.mass) / (i.mass + z.mass);
-                            b.remove(z);
-                        }else if (mode==2){
-                            float energyGain=1.1f;
-                            float vx1=i.vx,vy1=i.vy;
-                            i.vy=energyGain*(z.vy*z.mass)/i.mass;
-                            i.vx=energyGain*(z.vx*z.mass)/i.mass;
-                            z.vy=energyGain*(vy1*z.mass)/i.mass;
-                            z.vx=energyGain*(vx1*z.mass)/i.mass;
+        if (mode==1||mode==2) {
+            for (body i : b) {
+                for (body z : b) {
+                    if (z != i) {
+                        if (i.isSurroundingB(z)) {
+                            if (mode == 1) {
+                                i.mass = (float) (Math.sqrt(Math.pow(i.mass, 2) + Math.pow(z.mass, 2)));
+                                i.vx = (i.vx * i.mass + z.vx * z.mass) / (i.mass + z.mass);
+                                i.vy = (i.vy * i.mass + z.vy * z.mass) / (i.mass + z.mass);
+                                b.remove(z);
+                            } else if (mode == 2) {
+                                float energyGain = 1.1f;
+                                float vx1 = i.vx, vy1 = i.vy;
+                                i.vy = energyGain * (z.vy * z.mass) / i.mass;
+                                i.vx = energyGain * (z.vx * z.mass) / i.mass;
+                                z.vy = energyGain * (vy1 * z.mass) / i.mass;
+                                z.vx = energyGain * (vx1 * z.mass) / i.mass;
+                            }
                         }
                     }
                 }
@@ -90,6 +92,32 @@ public class Main extends Applet implements Runnable, KeyListener {
             try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
+
+    public body doesCollide(body b, float nx, float ny){
+        for (float o=0; o<6.28f; o+=(3.14f/10f)){
+            float px=nx+(float)(Math.cos(o)*(b.size/2f));
+            float py=ny+(float)(Math.sin(o)*(b.size/2f));
+            for (body b1: this.b){
+                if (b1!=b) {
+                    if (isPointInBody(px, py, b1)) {
+                        return b1;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    public boolean isPointInBody(float x, float y, body b){
+        float dx=(float)(Math.abs(x-b.x));
+        float dy=(float)(Math.abs(y-b.y));
+        float dist=(float)(Math.sqrt(dx*dx+dy*dy));
+        if (dist<b.size/2){
+            return true;
+        }
+        return false;
+    }
+
+
 
 
     //INPUT
