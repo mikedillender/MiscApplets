@@ -15,7 +15,7 @@ public class Main extends Applet implements Runnable, KeyListener,Screen {
 
     //COLORS
     Color background=new Color(255, 255, 255);
-    Color gridColor=new Color(150, 150,150);
+    //Color black=new Color(150, 150,150);
 
     Player p;
     Object o;
@@ -40,6 +40,9 @@ public class Main extends Applet implements Runnable, KeyListener,Screen {
         gfx.setColor(background);//background
         gfx.fillRect(0,0,sWIDTH,sHEIGHT);//background size
 
+        gfx.setColor(Color.BLACK);
+        float deg=p.ox*180/3.14f;
+        gfx.drawString("orient = "+p.ox+" ("+deg+")",10,20);
         //RENDER FOREGROUND
         //o.render(gfx,p);
         for (Object o:objects){
