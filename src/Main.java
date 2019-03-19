@@ -2,11 +2,11 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
-public class Main extends Applet implements Runnable, KeyListener {
+public class Main extends Applet implements Runnable, KeyListener,Screen {
 
     //BASIC VARIABLES
-    private final int WIDTH=1280, HEIGHT=900;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -17,13 +17,20 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(150, 150,150);
 
-
+    Player p;
+    Object o;
+    ArrayList<Object> objects;
 
     public void init(){//STARTS THE PROGRAM
-        this.resize(WIDTH, HEIGHT);
+        this.resize(sWIDTH, sHEIGHT);
         this.addKeyListener(this);
-        img=createImage(WIDTH,HEIGHT);
+        img=createImage(sWIDTH,sHEIGHT);
         gfx=img.getGraphics();
+        p=new Player();
+        objects=new ArrayList<>();
+        objects.add(new Object(4,0,0,1));
+        //objects.add(new Object(11,0,0,.5f));
+        //objects.add(new Object(12,0,0,.25f));
         thread=new Thread(this);
         thread.start();
     }
@@ -31,12 +38,15 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void paint(Graphics g){
         //BACKGROUND
         gfx.setColor(background);//background
-        gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
+        gfx.fillRect(0,0,sWIDTH,sHEIGHT);//background size
 
         //RENDER FOREGROUND
-
-
+        //o.render(gfx,p);
+        for (Object o:objects){
+            o.render(gfx,p);
+            System.out.println("rendering object");
+        }
+        System.out.println("done render");
         //FINAL
         g.drawImage(img,0,0,this);
     }
@@ -58,23 +68,28 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     //INPUT
     public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode()==KeyEvent.VK_W){
+            p.control(0);
+        } else if (e.getKeyCode()==KeyEvent.VK_D){
+            p.control(1);
+        } else if (e.getKeyCode()==KeyEvent.VK_S){
+            p.control(2);
+        } else if (e.getKeyCode()==KeyEvent.VK_A){
+            p.control(3);
+        } else if (e.getKeyCode()==KeyEvent.VK_UP){
+            p.control(4);
+        } else if (e.getKeyCode()==KeyEvent.VK_DOWN){
+            p.control(5);
+        } else if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+            p.control(6);
+        } else if (e.getKeyCode()==KeyEvent.VK_LEFT){
+            p.control(7);
+        }
     }
     public void keyReleased(KeyEvent e) {
 
     }
     public void keyTyped(KeyEvent e) { }
 
-    //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
-    public void paintCoordGrid(Graphics gfx){
-        gfx.setColor(gridColor);
-        for (int x=100; x<WIDTH; x+=100){
-            gfx.drawString(""+x, x, 20);
-            gfx.drawRect(x, 20, 1, HEIGHT);
-        }
-        for (int y=100; y<HEIGHT; y+=100){
-            gfx.drawString(""+y, 20, y);
-            gfx.drawRect(20, y, WIDTH, 1);
-        }
-    }
+
 }
