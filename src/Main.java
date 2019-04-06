@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1500, HEIGHT=1000;
+    private final int WIDTH=1600, HEIGHT=1000;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -23,6 +23,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(0);
     Color goalColor=new Color(255,0,0);
+    Color start=new Color(0,0,255);
+    Color cup = new Color(0,255,0);
 
     boolean isRunning=false;
     boolean straightening=false;
@@ -33,11 +35,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     boolean mouseControlOn=false;
 
     float totaldist=0;
-    int movesPerRef=15;
+    int movesPerRef=80;
     ArrayList<float[]> oldlocs;
     float[] loc;
     float[] color;
-    float carlength=50;
+    float carlength=20;
     float carspeed=3;
     float initorient=0;
     int dist=0;
@@ -60,12 +62,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
+        renderTrack(gfx);
         renderRope(gfx);
         gfx.drawString("ang of attack = "+initorient+", wheelangle = "+o1, 100,130);
         gfx.drawString("dist = "+dist+", total dist = "+totaldist, 100,170);
         //gfx.drawString("speed = "+movesPerRef, 100,130);
-        gfx.setColor(goalColor);
-        gfx.fillRect((int)goal[0],(int)goal[1],10,10);
         //RENDER FOREGROUND
 
 
@@ -87,6 +88,17 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
     }
 
+    public void renderTrack(Graphics gfx){
+        gfx.setColor(start);
+        gfx.fillRect(400, HEIGHT/2,10,10);
+        gfx.setColor(new Color(255,125,150));
+        gfx.drawLine(400,HEIGHT/2,1200,HEIGHT/2);
+        gfx.setColor(new Color(120,205,120));
+        gfx.drawLine(400,HEIGHT/2-25,1200,HEIGHT/2-25);
+        gfx.setColor(goalColor);
+        gfx.fillRect((int)goal[0],(int)goal[1],10,10);
+
+    }
     public void update(Graphics g){ //REDRAWS FRAME
 
         paint(g);
@@ -126,8 +138,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         //goal=new float[]{(float)-(Math.random()*WIDTH*.1)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
         //loc=new float[]{(float)(Math.random()*WIDTH*.1)+(WIDTH*5/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
         if (full){
-            loc=new float[]{(float)(Math.random()*WIDTH/2),(float)HEIGHT/2};
-            goal=new float[]{(float)(Math.random()*WIDTH/2)+(WIDTH/2),(float)HEIGHT/2};
+            loc=new float[]{400,HEIGHT/2};
+            goal=new float[]{1200,(float)HEIGHT/2};
             dist=(int)(goal[0]-loc[0]);
             totaldist=0;
         }else {
@@ -136,9 +148,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
 
         timeWitho2=1;
-        o=(float)(Math.random()*3.14)-(3.14159f/2f);
+        o=(float)-(Math.random()*3.14159/4);
         initorient=o;
-        o1=(float)(Math.random()*3.14/10);
+        o1=(float)(Math.random()*3.14/50);
         if (o>0){o1=-o1;}
         oldlocs=new ArrayList<>();
         oldlocs.add(loc);
@@ -155,9 +167,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             if (isRunning){
                 for (int i=0; i<movesPerRef; i++) {
                     if (hasReachedEnd()){
-                        isRunning=false;
+                        System.out.println("ang = "+initorient+" ; wheels = "+o1);
+                        reset(true);
+                        //isRunning=false;
                     }else {
-                        if (totaldist>dist*3){
+                        if (totaldist>dist*2){
                             reset(false);
                         }
                     }
