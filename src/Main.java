@@ -32,16 +32,17 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     boolean mouseControlOn=false;
 
-
-    int movesPerRef=3;
+    float totaldist=0;
+    int movesPerRef=15;
     ArrayList<float[]> oldlocs;
-    ArrayList<float[]> oldcolors;
     float[] loc;
     float[] color;
-    float speed=7;
+    float carlength=50;
+    float carspeed=3;
+    float initorient=0;
+    int dist=0;
     float o=0;//orientation
-    float o1=0;//rate of change
-    float o2=0;//rate of change of rate of change
+    float o1=0;//angle of wheels
 
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
@@ -49,9 +50,10 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         img=createImage(WIDTH,HEIGHT);
         gfx=img.getGraphics();
         thread=new Thread(this);
+        gfx.setFont(new Font("Arial",Font.BOLD,18));
         thread.start();
         addMouseListener(this);
-        reset();
+        reset(true);
     }
 
     public void paint(Graphics g){
@@ -59,11 +61,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
         renderRope(gfx);
-        gfx.drawString("o = "+o+", o1 = "+o1+", o2 = "+o2, 100,100);
-        gfx.drawString("speed = "+movesPerRef, 100,130);
+        gfx.drawString("ang of attack = "+initorient+", wheelangle = "+o1, 100,130);
+        gfx.drawString("dist = "+dist+", total dist = "+totaldist, 100,170);
+        //gfx.drawString("speed = "+movesPerRef, 100,130);
         gfx.setColor(goalColor);
         gfx.fillRect((int)goal[0],(int)goal[1],10,10);
-        if (!mouseControlOn){isRunning=true;}
         //RENDER FOREGROUND
 
 
@@ -75,8 +77,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     public void renderRope(Graphics g){
         g.setColor(gridColor);
         for (int i=0; i<oldlocs.size()-1; i++){
-            Color col=new Color((int)(oldcolors.get(i)[0]),(int)(oldcolors.get(i)[1]),(int)(oldcolors.get(i)[2]));
-            g.setColor(col);
+            //Color col=new Color((int)(oldcolors.get(i)[0]),(int)(oldcolors.get(i)[1]),(int)(oldcolors.get(i)[2]));
+            //g.setColor(col);
             if (lines){
                 g.drawLine((int) oldlocs.get(i)[0], (int) oldlocs.get(i)[1], (int) oldlocs.get(i+1)[0], (int) oldlocs.get(i+1)[1]);
             }else {
@@ -91,62 +93,16 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     }
 
     public void move(){
-        float dor=(float)(Math.atan((goal[1]-loc[1])/(goal[0]-loc[0])));
-        if ((goal[0]-loc[0])<0){ dor=dor+3.14f; }
+        //float dor=(float)(Math.atan((goal[1]-loc[1])/(goal[0]-loc[0])));
+        //if ((goal[0]-loc[0])<0){ dor=dor+3.14f; }
+        //o=o%6.28f;
 
-        //System.out.println("optimal dir = "+Math.toDegrees(dor));
-
-        o=o%6.28f;
-
-        timeWitho2--;
-        if (timeWitho2<1){
-            resetO2();
-        }
-        o=o+o1;
-        if (Math.abs(o1+o2)<3.14f*3/32) {
-            o1 = o1 + o2;
-        }else {
-            resetO2();
-        }
-
-        float[] color2=new float[3];
-        for (int i=0; i<3; i++){
-            float change=-10+(float)(20*Math.random());
-            if (color[i]+change>0&&color[i]+change<200){
-                color2[i]=color[i]+change;
-            }else {
-                color2[i]=color[i];
-            }
-        }
-        color=color2;
+        o=o+(o1*carspeed/carlength);
 
         oldlocs.add(loc);
-        oldcolors.add(color);
         //o=dor;
-
-        loc=new float[]{loc[0]+(float)(Math.cos(o)*speed),loc[1]+(float)(Math.sin(o)*speed)};
-    }
-    public void resetO2(){
-        float dor=(float)(Math.atan((goal[1]-loc[1])/(goal[0]-loc[0])));
-        if ((goal[0]-loc[0])<0){ dor=dor+3.14f; }
-
-        float ddor=dor-o;//ddor = the change needed to get in line
-
-        if (ddor>3.14){
-            ddor=-3.14f+ddor;
-        }
-
-        float dddor=ddor-o1;
-
-        o2=(float)(Math.random()*dddor/1);
-        //o2=(float)(3.14/16*Math.random())-(3.14f/32);
-        float rand=(float)(3.14/16*Math.random())-(3.14f/32);
-        o2=(o2+rand)/2f;
-
-
-        timeWitho2=(int)(Math.random()*15*Math.random())+1;
-        //timeWitho2=(int)(Math.random()*(ddor/o2))+1;
-
+        totaldist=totaldist+carspeed;
+        loc=new float[]{loc[0]+(float)(Math.cos(o)*carspeed),loc[1]+(float)(Math.sin(o)*carspeed)};
     }
 
 
@@ -163,43 +119,46 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
 
 
-    public void reset(){
+    public void reset(boolean full){
         //goal=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
         //loc=new float[]{(float)(Math.random()*WIDTH*.66)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
 
         //goal=new float[]{(float)-(Math.random()*WIDTH*.1)+(WIDTH/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
         //loc=new float[]{(float)(Math.random()*WIDTH*.1)+(WIDTH*5/6),(float)(Math.random()*HEIGHT*.66)+(HEIGHT/6)};
-
-        loc=new float[]{(float)(Math.random()*WIDTH*3/4)+(WIDTH/8),(float)-(Math.random()*HEIGHT*.1)+(HEIGHT/6)};
-        goal=new float[]{(float)(Math.random()*WIDTH*3/4)+(WIDTH/8),(float)(Math.random()*HEIGHT*.1)+(HEIGHT*5/6)};
+        if (full){
+            loc=new float[]{(float)(Math.random()*WIDTH/2),(float)HEIGHT/2};
+            goal=new float[]{(float)(Math.random()*WIDTH/2)+(WIDTH/2),(float)HEIGHT/2};
+            dist=(int)(goal[0]-loc[0]);
+            totaldist=0;
+        }else {
+            loc=oldlocs.get(0);
+            totaldist=0;
+        }
 
         timeWitho2=1;
-        o=(float)(Math.random()*3.14);
+        o=(float)(Math.random()*3.14)-(3.14159f/2f);
+        initorient=o;
         o1=(float)(Math.random()*3.14/10);
-        o2=(float)(Math.random()*3.14/10);
+        if (o>0){o1=-o1;}
         oldlocs=new ArrayList<>();
         oldlocs.add(loc);
-        oldcolors=new ArrayList<>();
         color =new float[]{
                 (float)(Math.random()*200),
                 (float)(Math.random()*200),
                 (float)(Math.random()*200)
         };
-        oldcolors.add(color);
 
     }
 
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
             //UPDATES
             if (isRunning){
-                if (mouseControlOn) {
-                    goal = new float[]{getMousePosition().getLocation().x, getMousePosition().getLocation().y};
-                }
                 for (int i=0; i<movesPerRef; i++) {
-                    if(!mouseControlOn) {
-                        if (hasReachedEnd()){
-                            goal=new float[]{(float)(Math.random()*WIDTH),(float)(Math.random()*HEIGHT)};
-
+                    if (hasReachedEnd()){
+                        isRunning=false;
+                    }else {
+                        if (totaldist>dist*3){
+                            reset(false);
                         }
                     }
                     move();
@@ -257,30 +216,17 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     //INPUT
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode()==KeyEvent.VK_SPACE){
-            move();
+            reset(false);
         }
         if (e.getKeyCode()==KeyEvent.VK_R){
-            reset();
-        }
-        if (e.getKeyCode()==KeyEvent.VK_F){
-            finish();
-        }
-        if (e.getKeyCode()==KeyEvent.VK_S){
-            straightening=!straightening;
-            straighten();
-        }
-        if (e.getKeyCode()==KeyEvent.VK_G){
-            pullDown();
+            reset(true);
         }
         if (e.getKeyCode()==KeyEvent.VK_P){
             isRunning=!isRunning;
         }
         if (e.getKeyCode()==KeyEvent.VK_LEFT){
-            //if (movesPerRef>0){
-                movesPerRef--;
-            //}
+            movesPerRef--;
         }
-
         if (e.getKeyCode()==KeyEvent.VK_RIGHT){
             movesPerRef++;
         }
