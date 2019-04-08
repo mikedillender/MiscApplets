@@ -193,7 +193,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
         if (v[1]==v[3]||v[0]==v[2]){return;}
-        float period=(float)(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28);
+        float period=(float)(5*(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28));
         System.out.println("period for new vector is "+period);
         vects.add(v);
         float slope=(float) (v[3]-v[1])/(float) (v[2]-v[0]);
@@ -220,11 +220,17 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
 
+
     public void drawwater(Graphics gfx){
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                gfx.setColor(new Color((int)(map[x][y]*255),(int)(map[x][y]*255),(int)(map[x][y]*255)));
-                gfx.fillRect(x*ppt , (y*ppt) , ppt, ppt);
+                if (map[x][y]>=0) {
+                    gfx.setColor(new Color((int) (map[x][y] * 255), (int) (map[x][y] * 255), (int) (map[x][y] * 255)));
+                }else {
+                    gfx.setColor(new Color(255,0,0));
+                }
+                gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+
             }
         }
 
@@ -300,6 +306,22 @@ public class Main extends Applet implements Runnable, KeyListener {
         return 0;
     }
 
+    public void addPond(){
+        float weight=.5f;
+        ranges=getQuartiles();
+        int cx=WIDTH/2;
+        int cy=HEIGHT/2;
+        for (int x=0;x<WIDTH;x++){
+            int dx=x-cx;
+            for (int y=0; y<HEIGHT; y++){
+                int dy=y-cy;
+                float rad=(float)Math.sqrt((((float)dx*dx)/((float)cx*cx))+(((float)dy*dy)/((float)cy*cy)));
+                if (rad>1){rad=1;}
+                map[x][y]=(map[x][y]+(weight*getPercentile(rad,ranges)))/(1+weight);
+            }
+        }
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -314,6 +336,9 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
+        if (key==KeyEvent.VK_P){
+            addPond();
+        }
         if (key == KeyEvent.VK_V) {
             addVector();
         }
@@ -336,6 +361,11 @@ public class Main extends Applet implements Runnable, KeyListener {
         if (key == KeyEvent.VK_R) {
             vects=new ArrayList<>();
             vectors=0;
+            for (int x=0; x<WIDTH; x++){
+                for (int y=0; y<HEIGHT; y++){
+                    map[x][y]=0;
+                }
+            }
         }
     }
 }
