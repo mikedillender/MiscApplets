@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int sWIDTH=1600, sHEIGHT=1000;
-    int ppt=4;
+    private final int sWIDTH=1600, sHEIGHT=800;
+    int ppt=40;
     private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
     Graphics gfx;
@@ -19,8 +19,11 @@ public class Main extends Applet implements Runnable, KeyListener {
     boolean done=false;
     int movetimer=20;
     ArrayList<Float> ranges;
-    int scale=2;
+    int scale=1;
     ArrayList<int[]> vects=new ArrayList<>();
+    ArrayList<short[]> path;
+    short[] st;
+    short[] end;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -31,7 +34,105 @@ public class Main extends Applet implements Runnable, KeyListener {
         thread.start();
         this.addKeyListener(this);
         map=new float[WIDTH][HEIGHT];
+        createMap();
+        path=new ArrayList<>();
+        st=new short[]{5,(short)(map[0].length/2)};
+        end=new short[]{(short)(map.length-5),(short)(map[0].length/2)};
+        //path.add(st);
+        createPath();
+    }
 
+    public void createPath(){
+        ArrayList<short[]> npath=pathBetween(path,st,end);
+        if (npath!=null){
+            path=npath;
+        }
+        //path=pathBetween(path,st,end);
+        /*while(path.get(path.size()-1)[0]!=end[0]||path.get(path.size()-1)[1]!=end[1]){
+            path(path.get(path.size()-1),end);
+        }*/
+    }
+
+
+
+
+    public void path(int[] cloc,int[] end){
+        int dir=0;
+        int xd=0;
+        if (cloc[0]>end[0]){
+            xd=-1;
+        }else if (cloc[0]<end[0]){
+            xd=1;
+        }
+        int yd=0;
+        if (cloc[1]>end[1]){
+            yd=-1;
+        }else if (cloc[1]<end[1]){
+            yd=1;
+        }
+        //path.add(new short[]{cloc[0]+xd,cloc[1]+yd});
+    }
+
+
+
+
+    public ArrayList<short[]> pathBetween(ArrayList<short[]> cpath, short[] cloc, short[] end){
+        //System.out.println("going from "+cloc[0]+","+cloc[1]+" to "+end[0]+","+end[1]);
+        if (cloc[0]<0||cloc[1]<0||cloc[0]>=map.length||cloc[1]>=map[0].length){return null;}
+        if(map[cloc[0]][cloc[1]]==0){return null;}
+        for (int i=0;i<cpath.size();i++){if (cpath.get(i)[0]==cloc[0]&&cpath.get(i)[1]==cloc[1]){return null;}}
+        //if (cpath.contains(cloc)){return null;}
+        cpath.add(cloc);
+        if (cloc==end){return cpath;}
+        ArrayList<short[]> npath=null;
+        for (int d=0; d<4; d++){
+            short[] newloc=new short[]{(short)(cloc[0]+getXInDir(d)),(short)(cloc[1]+getYInDir(d))};
+            System.out.println("size : "+cpath.size());
+            if (cpath.size()>1.5*(Math.abs(cloc[0]-end[0])+Math.abs(cloc[0]-end[0]))){return null;}
+            //if (cpath.contains(newloc)){continue;}
+            //int x=cloc[0]+getXInDir(d);
+            //int y=cloc[1]+getYInDir(d);
+            ArrayList<short[]> cnpath= (ArrayList<short[]>) cpath.clone();
+            cnpath=pathBetween(cnpath,newloc,end);
+            if (cnpath!=null){
+                if (npath==null){
+                    npath=cnpath;
+                }else {
+                    if (npath.size()>cnpath.size()){
+                        npath=cnpath;
+                    }
+                }
+            }
+        }
+        return npath;
+
+
+    }
+
+
+
+
+    public void createMap(){
+        for (int i=0; i<10; i++){
+            addVector();
+        }
+
+        ranges=getQuartiles();
+        scalePath();
+        ranges=getQuartiles();
+        createThreshhold();
+    }
+
+    public void scalePath(){
+        float weight=1f;
+        int midy=map[0].length/2;
+        for (int x=0; x<map.length; x+=scale) {
+            for (int y = 0; y < map[0].length; y += scale) {
+                float rad=(float)Math.pow(1f-(Math.abs(midy-y)/(float)midy),2);
+                map[x][y]=(map[x][y]+(weight*getPercentile(rad,ranges)))/(1+weight);
+
+            }
+        }
     }
 
     public void paint(Graphics g){
@@ -193,7 +294,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
         if (v[1]==v[3]||v[0]==v[2]){return;}
-        float period=(float)(5*(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28));
+        float period=(float)(5*(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28/10));
         System.out.println("period for new vector is "+period);
         vects.add(v);
         float slope=(float) (v[3]-v[1])/(float) (v[2]-v[0]);
@@ -233,7 +334,12 @@ public class Main extends Applet implements Runnable, KeyListener {
 
             }
         }
-
+        gfx.setColor(Color.BLUE);
+        for (int i=0; i<path.size(); i++){
+            int x=path.get(i)[0];
+            int y=path.get(i)[1];
+            gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+        }
         /*gfx.setColor(Color.RED);
         for (int i=0; i<vects.size(); i++){
             gfx.drawLine(vects.get(i)[0],vects.get(i)[1],vects.get(i)[2],vects.get(i)[3]);
@@ -288,7 +394,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
 
-    public int getXInDir(int dir){
+    public short getXInDir(int dir){
         if (dir==1){
             return 1;
         }else if (dir==3){
@@ -297,7 +403,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         return 0;
     }
 
-    public int getYInDir(int dir){
+    public short getYInDir(int dir){
         if (dir==0){
             return -1;
         }else if (dir==2){
@@ -335,7 +441,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-
+        /*
         if (key==KeyEvent.VK_P){
             addPond();
         }
@@ -366,6 +472,6 @@ public class Main extends Applet implements Runnable, KeyListener {
                     map[x][y]=0;
                 }
             }
-        }
+        }*/
     }
 }

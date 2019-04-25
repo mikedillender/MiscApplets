@@ -46,12 +46,12 @@
     <session id="-36692786">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="935" />
+          <entry key="java" value="2720" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="935" />
+          <entry key="JAVA" value="2720" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -70,14 +70,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="195" column="95" selection-start-line="195" selection-start-column="95" selection-end-line="195" selection-end-column="95" />
+            <state relative-caret-position="315">
+              <caret line="90" column="98" selection-start-line="90" selection-start-column="98" selection-end-line="90" selection-end-column="98" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1027#1028#0" expanded="true" />
-                <element signature="e#1067#1068#0" expanded="true" />
-                <element signature="e#4680#4681#0" expanded="true" />
-                <element signature="e#4715#4716#0" expanded="true" />
+                <element signature="e#4112#4113#0" expanded="true" />
+                <element signature="e#4152#4153#0" expanded="true" />
+                <element signature="e#7765#7766#0" expanded="true" />
+                <element signature="e#7800#7801#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -95,6 +95,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>par</find>
+      <find>getXinDi</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -119,6 +120,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -135,11 +138,10 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1556227005682" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/java.policy.applet" />
   </component>
   <component name="RunDashboard">
@@ -202,10 +204,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
+    <frame x="-8" y="-8" width="1520" height="978" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.29883483" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.3068493" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -214,7 +216,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32979852" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3289941" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997879" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -222,7 +224,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32979852" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.3289941" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -247,14 +249,14 @@
     <entry file="file://$PROJECT_DIR$/src/java/policy/applet.java" />
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="195" column="95" selection-start-line="195" selection-start-column="95" selection-end-line="195" selection-end-column="95" />
+        <state relative-caret-position="315">
+          <caret line="90" column="98" selection-start-line="90" selection-start-column="98" selection-end-line="90" selection-end-column="98" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1027#1028#0" expanded="true" />
-            <element signature="e#1067#1068#0" expanded="true" />
-            <element signature="e#4680#4681#0" expanded="true" />
-            <element signature="e#4715#4716#0" expanded="true" />
+            <element signature="e#4112#4113#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#7765#7766#0" expanded="true" />
+            <element signature="e#7800#7801#0" expanded="true" />
           </folding>
         </state>
       </provider>
