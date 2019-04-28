@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int sWIDTH=1600, sHEIGHT=800;
+    private final int sWIDTH=800, sHEIGHT=800;
     int ppt=40;
     private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
@@ -20,10 +20,14 @@ public class Main extends Applet implements Runnable, KeyListener {
     int movetimer=20;
     ArrayList<Float> ranges;
     int scale=1;
+    int maxIterations=3;
     ArrayList<int[]> vects=new ArrayList<>();
     ArrayList<short[]> path;
     short[] st;
     short[] end;
+    private ArrayList<ArrayList<short[]>> pausedPaths;
+    private ArrayList<short[]> pausedlocs;
+    private ArrayList<ArrayList<short[]>> allpaths;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -33,20 +37,33 @@ public class Main extends Applet implements Runnable, KeyListener {
         thread=new Thread(this);
         thread.start();
         this.addKeyListener(this);
+        reset();
+
+    }
+
+    public void reset(){
+        st=new short[]{0,(short)(HEIGHT/2)};
+        end=new short[]{(short)(WIDTH-1),(short)((HEIGHT-1)*Math.random())};
         map=new float[WIDTH][HEIGHT];
+        maxIterations=1;
+        pausedPaths=null;
+        pausedlocs=null;
+        allpaths=null;
+        //maxIterations=(int)(Math.ceil((Math.abs(st[0]-end[0])+Math.abs(st[1]-end[1]))/3));
         createMap();
         path=new ArrayList<>();
-        st=new short[]{5,(short)(map[0].length/2)};
-        end=new short[]{(short)(map.length-5),(short)(map[0].length/2)};
-        //path.add(st);
-        createPath();
     }
 
     public void createPath(){
-        ArrayList<short[]> npath=pathBetween(path,st,end);
-        if (npath!=null){
+        allpaths=new ArrayList<>();
+        pausedPaths=new ArrayList<ArrayList<short[]>>();
+        pausedlocs=new ArrayList<short[]>();
+        //ArrayList<short[]> npath=pathBetween(path,st);
+        pathBetween(path,st,(short)0);
+
+        /*if (npath!=null){
             path=npath;
-        }
+        }*
         //path=pathBetween(path,st,end);
         /*while(path.get(path.size()-1)[0]!=end[0]||path.get(path.size()-1)[1]!=end[1]){
             path(path.get(path.size()-1),end);
@@ -74,34 +91,123 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
 
+    private int getDirToGoal(short[] cloc,short[] end){
+        int dir=0;
+        int xd=0;
+
+        if (cloc[0]>end[0]){
+            xd=3;
+        }else if (cloc[0]<end[0]){
+            xd=1;
+        }
+        int yd=0;
+        if (cloc[1]>end[1]){
+            yd=0;
+        }else if (cloc[1]<end[1]){
+            yd=2;
+        }
+        if (Math.abs(cloc[1]-end[1])>Math.abs(cloc[0]-end[0])){
+            return yd;
+        }return xd;
+    }
 
 
-    public ArrayList<short[]> pathBetween(ArrayList<short[]> cpath, short[] cloc, short[] end){
+
+    public void resumePaths(){
+        if (pausedPaths==null){
+            createPath();
+            return;
+        }
+        for (int i=0; i<pausedlocs.size(); i++){
+            for (int j=i+1; j<pausedlocs.size(); j++){
+                if (pausedlocs.get(i)[0]==pausedlocs.get(j)[0]) {
+                    if (pausedlocs.get(i)[1] == pausedlocs.get(j)[1]) {
+                        if (pausedPaths.get(j).size()>=pausedPaths.get(i).size()) {
+                            pausedlocs.remove(j);
+                            pausedPaths.remove(j);
+                        }else {
+                            pausedlocs.remove(i);
+                            pausedPaths.remove(i);
+                        }
+                    }
+                }
+            }
+        }
+        ArrayList<ArrayList<short[]>> ppaths= (ArrayList<ArrayList<short[]>>) pausedPaths.clone();
+        ArrayList<short[]> plocs= (ArrayList<short[]>) pausedlocs.clone();
+        pausedPaths=new ArrayList<ArrayList<short[]>>();
+        pausedlocs=new ArrayList<short[]>();
+        int maxchecks=50;
+        int checks=ppaths.size();
+        if (checks>maxchecks){checks=maxchecks;}
+        System.out.println("checking closest "+checks+" of "+ppaths.size());
+        for (int t=0; t<checks; t++){
+            int cdist=1000;
+            int cIndex=0;
+            for (int i=0; i<ppaths.size(); i++){
+                short[] loc=plocs.get(i);
+                int dx=loc[0]-end[0];
+                int dy=loc[1]-end[1];
+                int d=(int)(Math.sqrt(dx*dx+dy*dy));
+                if (d<cdist){
+                    cdist=d;
+                    cIndex=i;
+                }
+            }
+            pathBetween(ppaths.get(cIndex),plocs.get(cIndex),(short)0);
+            ppaths.remove(cIndex);
+            plocs.remove(cIndex);
+        }
+
+    }
+
+    public void solve(){
+        createPath();
+        long s=System.nanoTime();
+        float dt=0;
+        while (path.size()<5&&dt<3){
+            resumePaths();
+            dt=(System.nanoTime()-s)/1000000000f;
+        }
+        System.out.println("solved in "+dt);
+    }
+
+    public ArrayList<short[]> pathBetween(ArrayList<short[]> cpath, short[] cloc, short iteration){
         //System.out.println("going from "+cloc[0]+","+cloc[1]+" to "+end[0]+","+end[1]);
         if (cloc[0]<0||cloc[1]<0||cloc[0]>=map.length||cloc[1]>=map[0].length){return null;}
         if(map[cloc[0]][cloc[1]]==0){return null;}
         for (int i=0;i<cpath.size();i++){if (cpath.get(i)[0]==cloc[0]&&cpath.get(i)[1]==cloc[1]){return null;}}
+        if (iteration>maxIterations){
+            //System.out.println("too long, "+iteration+">"+maxIterations);
+            pausedlocs.add(cloc);
+            pausedPaths.add(cpath);
+            return null;
+        }
         //if (cpath.contains(cloc)){return null;}
         cpath.add(cloc);
-        if (cloc==end){return cpath;}
+        if (cloc[0]==end[0]&&cloc[1]==end[1]){
+            if (allpaths.size()==0){
+                path=cpath;
+            }
+            allpaths.add(cpath);
+            System.out.println("found a route of l = "+cpath.size());
+            return cpath;
+        }
+
+        int bestd=getDirToGoal(cloc,end);
+        int d=bestd;
         ArrayList<short[]> npath=null;
-        for (int d=0; d<4; d++){
+        for (int dir=0; dir<4; dir++){
+            if (dir==1){ d++; }else if (d==2){d-=2;}else if (d==3){d--;}
+            if (d<0){d+=4;}else if (d>3){d-=4;}
             short[] newloc=new short[]{(short)(cloc[0]+getXInDir(d)),(short)(cloc[1]+getYInDir(d))};
-            System.out.println("size : "+cpath.size());
-            if (cpath.size()>1.5*(Math.abs(cloc[0]-end[0])+Math.abs(cloc[0]-end[0]))){return null;}
-            //if (cpath.contains(newloc)){continue;}
-            //int x=cloc[0]+getXInDir(d);
-            //int y=cloc[1]+getYInDir(d);
+            //System.out.println("size : "+cpath.size());
+
+
             ArrayList<short[]> cnpath= (ArrayList<short[]>) cpath.clone();
-            cnpath=pathBetween(cnpath,newloc,end);
+            cnpath=pathBetween(cnpath,newloc, (short)(iteration+1));
             if (cnpath!=null){
-                if (npath==null){
-                    npath=cnpath;
-                }else {
-                    if (npath.size()>cnpath.size()){
-                        npath=cnpath;
-                    }
-                }
+                return cnpath;
             }
         }
         return npath;
@@ -116,11 +222,11 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (int i=0; i<10; i++){
             addVector();
         }
-
         ranges=getQuartiles();
-        scalePath();
+        //scalePath();
         ranges=getQuartiles();
         createThreshhold();
+        if (map[end[0]][end[1]]==0||map[st[0]][st[1]]==0){createMap();}
     }
 
     public void scalePath(){
@@ -210,14 +316,9 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
                 if (map[x][y]<ranges.get(ranges.size()/3)){
-                    map[x][y]=.25f;
-                    map[x][y]=.01f;
-                }else if (map[x][y]<ranges.get(ranges.size()/3*2)){
-                    map[x][y]=.5f;
-                    map[x][y]=.01f;
+                    map[x][y]=.0f;
                 }else {
-                    map[x][y]=.75f;
-                    //map[x][y]=.01f;
+                    map[x][y]=1f;
                 }
             }
         }
@@ -334,12 +435,38 @@ public class Main extends Applet implements Runnable, KeyListener {
 
             }
         }
+
+        if (pausedlocs!=null){
+            gfx.setColor(Color.orange);
+           for (int i=0; i<pausedlocs.size();i++){
+               int x=pausedlocs.get(i)[0];
+               int y=pausedlocs.get(i)[1];
+               gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+           }
+        }
+        if (allpaths!=null) {
+            for (int z = 0; z < allpaths.size(); z++) {
+                //gfx.setColor(new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+                gfx.setColor(Color.GREEN);
+                for (int i = 0; i < allpaths.get(z).size(); i++) {
+                    int x = allpaths.get(z).get(i)[0];
+                    int y = allpaths.get(z).get(i)[1];
+                    gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+                }
+            }
+        }
         gfx.setColor(Color.BLUE);
         for (int i=0; i<path.size(); i++){
             int x=path.get(i)[0];
             int y=path.get(i)[1];
             gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
         }
+        gfx.setColor(Color.RED);
+        int x=end[0];
+        int y=end[1];
+        gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+
+
         /*gfx.setColor(Color.RED);
         for (int i=0; i<vects.size(); i++){
             gfx.drawLine(vects.get(i)[0],vects.get(i)[1],vects.get(i)[2],vects.get(i)[3]);
@@ -435,12 +562,24 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        int key = e.getKeyCode();
+        if (key==KeyEvent.VK_SPACE){
+            resumePaths();
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
+        if (key==KeyEvent.VK_P){
+            createPath();
+            System.out.println("path found, l = "+path.size());
+        }else if (key==KeyEvent.VK_R){
+            reset();
+        }else if (key==KeyEvent.VK_S){
+            reset();
+            solve();
+        }
         /*
         if (key==KeyEvent.VK_P){
             addPond();
