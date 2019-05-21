@@ -20,7 +20,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     //COLORS
     Color background=new Color(31, 30, 43);
     int tilesize=4;
-
+    int stars=0;
     //"CHARACTER"
     Color[][] map=new Color[WIDTH/tilesize][HEIGHT/tilesize];
 
@@ -56,17 +56,20 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         //UPDATES
         //UPDATES
-        spawntimer-=2;
-        movetimer-=2;
-        if (movetimer<0){
-            movetimer=10;
+        if (stars>=0&&stars<20) {
+            spawntimer -= 2;
+            movetimer -= 2;
+            if (movetimer < 0) {
+                movetimer = 10;
+            }
+            if (spawntimer < 0) {
+                addStar();
+                spawntimer = 20;
+            }
+        }else if (stars==20){
+            save();
+            stars++;
         }
-        if (spawntimer<0){
-            addStar();
-            spawntimer=20;
-        }
-
-
 
 
         repaint();//UPDATES FRAME
@@ -88,6 +91,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         float r=c-range+(float)(Math.random()*2*range);
         float g=c-range+(float)(Math.random()*2*range);
         float b=c-range+(float)(Math.random()*2*range);
+        stars++;
 
 
 
@@ -152,10 +156,20 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void save()
     {
-        BufferedImage bImg = new BufferedImage(img);
+        // Initialize BufferedImage, assuming Color[][] is already properly populated.
+        BufferedImage bufferedImage = new BufferedImage(map.length,map.length, BufferedImage.TYPE_INT_RGB);
+
+// Set each pixel of the BufferedImage to the color from the Color[][].
+        for (int x = 0; x < map.length; x++) {
+            for (int y = 0; y < map[x].length; y++) {
+                if (map[x][y]!=null) {
+                    bufferedImage.setRGB(x, y, map[x][y].getRGB());
+                }
+            }
+        }
 
         try {
-            if (ImageIO.write(bImg, "png", new File("./output_image.png")))
+            if (ImageIO.write(bufferedImage, "png", new File("./output_image.png")))
             {
                 System.out.println("-- saved");
             }
