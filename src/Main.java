@@ -26,14 +26,24 @@ public class Main extends Applet implements Runnable, KeyListener {
         gfx=img.getGraphics();
         thread=new Thread(this);
         thread.start();
+
     }
 
     public void paint(Graphics g){
         //BACKGROUND
         gfx.setColor(background);//background
+        Color epilepsy=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        paintCoordGrid(gfx);
+        //paintCoordGrid(gfx);
+        gfx.setColor(new Color(0,0,0));
+        gfx.setFont(gfx.getFont().deriveFont(70f));
 
+        gfx.setColor(epilepsy);
+        gfx.drawString("NOTES",WIDTH/3,HEIGHT/10);
+
+        gfx.setFont(gfx.getFont().deriveFont(50f));
+
+        gfx.drawString("the environment is important",WIDTH/5,HEIGHT/10+60);
         //RENDER FOREGROUND
 
 
