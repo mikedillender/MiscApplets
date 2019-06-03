@@ -118,26 +118,12 @@ public class Main extends Applet implements Runnable, KeyListener {
             createPath();
             return;
         }
-        for (int i=0; i<pausedlocs.size(); i++){
-            for (int j=i+1; j<pausedlocs.size(); j++){
-                if (pausedlocs.get(i)[0]==pausedlocs.get(j)[0]) {
-                    if (pausedlocs.get(i)[1] == pausedlocs.get(j)[1]) {
-                        if (pausedPaths.get(j).size()>=pausedPaths.get(i).size()) {
-                            pausedlocs.remove(j);
-                            pausedPaths.remove(j);
-                        }else {
-                            pausedlocs.remove(i);
-                            pausedPaths.remove(i);
-                        }
-                    }
-                }
-            }
-        }
+        cleanPaths();
         ArrayList<ArrayList<short[]>> ppaths= (ArrayList<ArrayList<short[]>>) pausedPaths.clone();
         ArrayList<short[]> plocs= (ArrayList<short[]>) pausedlocs.clone();
         pausedPaths=new ArrayList<ArrayList<short[]>>();
         pausedlocs=new ArrayList<short[]>();
-        int maxchecks=50;
+        int maxchecks=100;
         int checks=ppaths.size();
         if (checks>maxchecks){checks=maxchecks;}
         System.out.println("checking closest "+checks+" of "+ppaths.size());
@@ -158,9 +144,54 @@ public class Main extends Applet implements Runnable, KeyListener {
             ppaths.remove(cIndex);
             plocs.remove(cIndex);
         }
-
+        cleanPaths();
     }
 
+
+    public void cleanPaths(){
+        for (int i=0; i<pausedlocs.size(); i++){
+            for (int j=i+1; j<pausedlocs.size(); j++){
+                if (pausedlocs.get(i)[0]==pausedlocs.get(j)[0]) {
+                    if (pausedlocs.get(i)[1] == pausedlocs.get(j)[1]) {
+                        if (pausedPaths.get(j).size()>=pausedPaths.get(i).size()) {
+                            pausedlocs.remove(j);
+                            pausedPaths.remove(j);
+                        }else {
+                            pausedlocs.remove(i);
+                            pausedPaths.remove(i);
+                        }
+                    }
+                }
+            }
+        }
+        for (int i=0; i<pausedlocs.size(); i++) {
+            int adj = 0;
+            ArrayList<short[]> adjloc=new ArrayList<>();
+            int[] indexs=new int[]{-1,-1,-1,-1};
+            int x=pausedlocs.get(i)[0];
+            int y=pausedlocs.get(i)[1];
+            for (int d=0; d<4;d++){
+                short xd=(short)(x+getXInDir(d)+getXInDir(d+1));
+                short yd=(short)(y+getYInDir(d)+getYInDir(d+1));
+                adjloc.add(new short[]{xd,yd});
+            }
+            for (int j = i + 1; j < pausedlocs.size(); j++) {
+                short x1=pausedlocs.get(j)[0];
+                short y1=pausedlocs.get(j)[1];
+                for (int d=0; d<4; d++){
+                    if(x1==adjloc.get(d)[0]&&y1==adjloc.get(d)[1]){
+                        indexs[d]=j;
+                        adj++;
+                    }
+                }
+            }
+            if (adj>3){
+                pausedPaths.remove(i);
+                pausedlocs.remove(i);
+                i--;
+            }
+        }
+    }
     public void solve(){
         createPath();
         long s=System.nanoTime();
@@ -207,7 +238,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             ArrayList<short[]> cnpath= (ArrayList<short[]>) cpath.clone();
             cnpath=pathBetween(cnpath,newloc, (short)(iteration+1));
             if (cnpath!=null){
-                return cnpath;
+               // return cnpath;
             }
         }
         return npath;
@@ -522,6 +553,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
 
     public short getXInDir(int dir){
+        if (dir<0){dir+=4;}else if (dir>3){dir-=4;}
         if (dir==1){
             return 1;
         }else if (dir==3){
@@ -531,6 +563,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public short getYInDir(int dir){
+        if (dir<0){dir+=4;}else if (dir>3){dir-=4;}
+
         if (dir==0){
             return -1;
         }else if (dir==2){
