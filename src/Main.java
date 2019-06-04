@@ -1,3 +1,5 @@
+import com.sun.javafx.geom.Vec2f;
+
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -9,97 +11,217 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1280, HEIGHT=900;
+    private final int WIDTH = 1280, HEIGHT = 900;
+    private float radius=10;
 
     //GRAPHICS OBJECTS
     private Thread thread;
     Graphics gfx;
     Image img;
-
+    boolean gravOn=false;
     //COLORS
-    Color background=new Color(255, 255, 255);
-    Color gridColor=new Color(150, 150,150);
-    Color clickcol=new Color(100,100,200);
-    ArrayList<float[]> clicks=new ArrayList<>();
+    Color background = new Color(255, 255, 255);
+    //Color gridColor = new Color(150, 150, 150);
+    //ArrayList<float[]> clicks = new ArrayList<>();
 
 
+    ArrayList<Vec2f[]> ptcls=new ArrayList<>();
 
-    public void init(){//STARTS THE PROGRAM
+
+    public void init() {//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
         this.addMouseListener(this);
-        img=createImage(WIDTH,HEIGHT);
-        gfx=img.getGraphics();
-        thread=new Thread(this);
+        img = createImage(WIDTH, HEIGHT);
+        gfx = img.getGraphics();
+        thread = new Thread(this);
         thread.start();
 
     }
 
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
         //BACKGROUND
         gfx.setColor(background);//background
-        Color epilepsy=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
-        gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
-        //paintCoordGrid(gfx);
-        gfx.setColor(new Color(0,0,0));
-        gfx.setFont(gfx.getFont().deriveFont(70f));
+        gfx.fillRect(0, 0, WIDTH, HEIGHT);//background size
 
-        gfx.setColor(epilepsy);
-        gfx.drawString("NOTES",WIDTH/3,HEIGHT/10);
+        for (Vec2f[] p: ptcls){
+            float e=getEnergyOf(p)/100;
+            if (e>1){e=1;}
+            gfx.setColor(new Color(e,0,1-e));
 
-        gfx.setFont(gfx.getFont().deriveFont(50f));
-
-        gfx.drawString("the environment is important",WIDTH/5,HEIGHT/10+60);
-        //RENDER FOREGROUND
-        gfx.setColor(clickcol);
-        if (clicks.size()>=2) {
-            float[] last = clicks.get(0);
-            for (float[] c : clicks) {
-                gfx.drawLine((int)last[0],(int)last[1],(int)c[0],(int)c[1]);
-                last=c;
-            }
+            gfx.fillOval((int)(p[0].x-radius),(int)(p[0].y-radius),(int)(radius*2),(int)(radius*2));
         }
-
+        gfx.setColor(new Color(0, 0, 0));
+        gfx.setFont(gfx.getFont().deriveFont(30f));
+        gfx.drawString(printEnergy(),50,100);
         //FINAL
-        g.drawImage(img,0,0,this);
+        g.drawImage(img, 0, 0, this);
     }
 
-    public void update(Graphics g){ //REDRAWS FRAME
+    public void update(Graphics g) { //REDRAWS FRAME
         paint(g);
+        updateParticles();
+        if (gravOn){
+            gravitize();
+        }
+        //printEnergy();
     }
 
-    public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
+
+    public void run() {
+        for (; ; ) {//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
 
-
             repaint();//UPDATES FRAME
-            try{ Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
-            catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
-    } }
+            try {
+                Thread.sleep(15);
+            } //ADDS TIME BETWEEN FRAMES (FPS)
+            catch (InterruptedException e) {
+                e.printStackTrace();
+                System.out.println("GAME FAILED TO RUN");
+            }//TELLS USER IF GAME CRASHES AND WHY
+        }
+    }
 
+    private void addParticle(){
+        float x=(float)(Math.random()*WIDTH*.8)+(WIDTH*.1f);
+        float y=(float)(Math.random()*HEIGHT*.8)+(HEIGHT*.1f);
+        float vx=(float)(Math.random()*3-1.5);
+        float vy=(float)(Math.random()*3-1.5);
+        for (int i = 0; i < ptcls.size(); i++) {
+            Vec2f dv=new Vec2f(ptcls.get(i)[0].x-x,ptcls.get(i)[0].y-y);
+            float dist=(float)(Math.sqrt(dv.x*dv.x+dv.y*dv.y));
+            if (dist<=radius*2f){
+                return;
+            }
+        }
+        ptcls.add(new Vec2f[]{new Vec2f(x,y),new Vec2f(vx,vy)});
+
+    }
+
+    private String printEnergy(){
+        float total=0;
+        for (Vec2f[] p: ptcls){
+            total+=getEnergyOf(p);
+        }
+        float avg=total/ptcls.size();
+        return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg;
+
+    }
+
+    private void updateParticles(){
+        for (Vec2f[] p:ptcls){
+            Vec2f newp=new Vec2f(p[0].x+p[1].x,p[0].y+p[1].y);
+            float speed=getSpeedOf(p);
+            int b=hasBumpedWall(newp);
+            if (b==-1) {
+                int ind = ptcls.indexOf(p);
+                boolean hasCollided=false;
+                for (int i = 0; i < ptcls.size(); i++) {
+                    if (i==ind){continue;}
+                    Vec2f dv=new Vec2f(ptcls.get(i)[0].x-newp.x,ptcls.get(i)[0].y-newp.y);
+                    float dist=(float)(Math.sqrt(dv.x*dv.x+dv.y*dv.y));
+
+                    if (dist<=radius*2f){ // PERFORM COLLISION
+                        if (dv.x==0){dv.x=.00000001f;}
+                        float orient=(float)Math.atan(dv.y/dv.x);// ORIENT FROM A TO B
+                        if (dv.x<0){orient+=3.14f;}
+                        orient+=3.14f;
+
+                        float vel2=getSpeedOf(ptcls.get(i));
+                        float totalEnergy=speed*speed+vel2*vel2;
+
+                        float energyDif=getEnergyOf(p)-getEnergyOf(ptcls.get(i));
+                        //System.out.println(getEnergyOf(p)+" - "+getEnergyOf(ptcls.get(i))+" = "+energyDif);
+                        float s1=(float)Math.sqrt(getEnergyOf(p)-(energyDif/2f));
+                        float s2=(float)Math.sqrt(getEnergyOf(ptcls.get(i))+(energyDif/2f));
+
+                        //DO CHANGES
+                        p[1].x=(float)(s1*Math.cos(orient));
+                        p[1].y=(float)(s1*Math.sin(orient));
+                        orient+=3.14f;
+                        ptcls.get(i)[1].x=(float)(s2*Math.cos(orient));
+                        ptcls.get(i)[1].y=(float)(s2*Math.sin(orient));
+
+                        float totalEnergy1=getEnergyOf(p)+getEnergyOf(ptcls.get(i));
+                        //System.out.println("E0 = "+totalEnergy+", E1 = "+totalEnergy1);
+                        hasCollided=true;
+
+                    }
+                }
+                if (!hasCollided){
+                    p[0]=newp;
+                }
+            }else {
+                if (b%2==1){
+                    p[1].x=-p[1].x;
+                }else {
+                    p[1].y=-p[1].y;
+                }
+            }
+        }
+
+    }
+
+    private float getEnergyOf(Vec2f[] p){
+        float speed=getSpeedOf(p);
+        return speed*speed;
+    }
+
+    private float getSpeedOf(Vec2f[] p){
+        return (float)(Math.sqrt(p[1].x*p[1].x+p[1].y*p[1].y));
+    }
+
+    private int hasBumpedWall(Vec2f pos){
+        if (pos.x+radius>=WIDTH){
+            return 1;
+        }else if (pos.x-radius<=0){
+            return 3;
+        }else if (pos.y+radius>=HEIGHT){
+            return 2;
+        }else if (pos.y-radius<=0){
+            return 0;
+        }
+        return -1;
+    }
+
+    public void changeSpeed(float amt) {
+        for (Vec2f[] p : ptcls) {
+            float speed=(float)(amt*(Math.sqrt(p[1].x*p[1].x+p[1].y*p[1].y)));
+            float orient=(float)Math.atan(p[1].y/p[1].x);
+            if (p[1].x<0){orient+=3.14f;}
+            p[1].x=(float)(speed*Math.cos(orient));
+            p[1].y=(float)(speed*Math.sin(orient));
+
+        }
+    }
+    private void gravitize(){
+        for (Vec2f[] p : ptcls) {
+            p[1].y+=.05f;
+        }
+    }
 
     //INPUT
     public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode()==KeyEvent.VK_DOWN){
+            changeSpeed(.9f);
+        }else if (e.getKeyCode()==KeyEvent.VK_UP){
+            changeSpeed(1.1f);
+        }else {
+            addParticle();
+        }
     }
+
     public void keyReleased(KeyEvent e) {
-
-    }
-    public void keyTyped(KeyEvent e) { }
-
-    //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
-    public void paintCoordGrid(Graphics gfx){
-        gfx.setColor(gridColor);
-        for (int x=100; x<WIDTH; x+=100){
-            gfx.drawString(""+x, x, 20);
-            gfx.drawRect(x, 20, 1, HEIGHT);
-        }
-        for (int y=100; y<HEIGHT; y+=100){
-            gfx.drawString(""+y, 20, y);
-            gfx.drawRect(20, y, WIDTH, 1);
+        if (e.getKeyCode()==KeyEvent.VK_G){
+            gravOn=!gravOn;
         }
     }
+
+    public void keyTyped(KeyEvent e) {
+    }
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -108,7 +230,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     @Override
     public void mousePressed(MouseEvent e) {
-        clicks.add(new float[]{e.getX(), e.getY()});
+
     }
 
     @Override
