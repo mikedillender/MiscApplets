@@ -105,7 +105,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         for (Vec2f[] p: ptcls){
             total+=getEnergyOf(p);
         }
+        total=(Math.round(total*100))/100f;
         float avg=total/ptcls.size();
+        avg=(Math.round(avg*100)/100f);
         return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg;
 
     }
