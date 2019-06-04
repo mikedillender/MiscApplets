@@ -12,7 +12,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     //BASIC VARIABLES
     private final int WIDTH = 1280, HEIGHT = 900;
-    private float radius=10;
+    private float radius=3;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -45,7 +45,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.fillRect(0, 0, WIDTH, HEIGHT);//background size
 
         for (Vec2f[] p: ptcls){
-            float e=getEnergyOf(p)/100;
+            float e=getEnergyOf(p)/50;
             if (e>1){e=1;}
             gfx.setColor(new Color(e,0,1-e));
 
@@ -108,7 +108,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         total=(Math.round(total*100))/100f;
         float avg=total/ptcls.size();
         avg=(Math.round(avg*100)/100f);
-        return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg;
+        return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg+", gravity = "+gravOn;
 
     }
 
@@ -206,7 +206,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     //INPUT
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode()==KeyEvent.VK_DOWN){
+        if (e.getKeyCode()==KeyEvent.VK_R) {
+            ptcls=new ArrayList<>();
+        }else if(e.getKeyCode()==KeyEvent.VK_P){
+            for (int i=0; i<50; i++){addParticle();}
+        }if (e.getKeyCode()==KeyEvent.VK_DOWN){
             changeSpeed(.9f);
         }else if (e.getKeyCode()==KeyEvent.VK_UP){
             changeSpeed(1.1f);
