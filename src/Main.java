@@ -24,7 +24,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     //Color gridColor = new Color(150, 150, 150);
     //ArrayList<float[]> clicks = new ArrayList<>();
     float redScale=100;
-    float intermolecularConstant=5;
+    float intermolecularConstant=15;
 
 
     ArrayList<Vec2f[]> ptcls=new ArrayList<>();
@@ -56,7 +56,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.setColor(new Color(0, 0, 0));
         gfx.setFont(gfx.getFont().deriveFont(30f));
         gfx.drawString(printEnergy(),50,60);
-        gfx.drawString("gravity = "+gravOn+", intermolecular constant = "+intermolecularConstant,50,100);
+        gfx.drawString("gravity = "+gravOn+", intermolecular constant = "+intermolecularConstant+" (G*m*m="+(intermolecularConstant*radius*radius)+")",50,100);
         //FINAL
         g.drawImage(img, 0, 0, this);
     }
