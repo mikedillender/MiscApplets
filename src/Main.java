@@ -12,7 +12,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     //BASIC VARIABLES
     private final int WIDTH = 1280, HEIGHT = 900;
-    private float radius=3;
+    private float radius=5;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -23,6 +23,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     Color background = new Color(255, 255, 255);
     //Color gridColor = new Color(150, 150, 150);
     //ArrayList<float[]> clicks = new ArrayList<>();
+    float redScale=100;
+    float intermolecularConstant=5;
 
 
     ArrayList<Vec2f[]> ptcls=new ArrayList<>();
@@ -45,7 +47,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.fillRect(0, 0, WIDTH, HEIGHT);//background size
 
         for (Vec2f[] p: ptcls){
-            float e=getEnergyOf(p)/50;
+            float e=getEnergyOf(p)/redScale;
             if (e>1){e=1;}
             gfx.setColor(new Color(e,0,1-e));
 
@@ -53,7 +55,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         gfx.setColor(new Color(0, 0, 0));
         gfx.setFont(gfx.getFont().deriveFont(30f));
-        gfx.drawString(printEnergy(),50,100);
+        gfx.drawString(printEnergy(),50,60);
+        gfx.drawString("gravity = "+gravOn+", intermolecular constant = "+intermolecularConstant,50,100);
         //FINAL
         g.drawImage(img, 0, 0, this);
     }
@@ -64,6 +67,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         if (gravOn){
             gravitize();
         }
+        attract(intermolecularConstant*radius*radius);
         //printEnergy();
     }
 
@@ -82,6 +86,30 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
                 System.out.println("GAME FAILED TO RUN");
             }//TELLS USER IF GAME CRASHES AND WHY
         }
+    }
+
+    private void attract(float amt){
+        for (Vec2f[] p:ptcls){
+            float speed=getSpeedOf(p);
+            int ind = ptcls.indexOf(p);
+            boolean hasCollided=false;
+            for (int i = 0; i < ptcls.size(); i++) {
+                if (i==ind){continue;}
+                Vec2f dv=new Vec2f(ptcls.get(i)[0].x-p[0].x,ptcls.get(i)[0].y-p[0].y);
+                float dist=(float)(Math.sqrt(dv.x*dv.x+dv.y*dv.y));
+                float accel=(float)(amt/(dist*dist));
+                if (dv.x==0){dv.x=.00000001f;}
+                float orient=(float)Math.atan(dv.y/dv.x);// ORIENT FROM A TO B
+                if (dv.x<0){orient+=3.14f;}
+
+                p[1].x+=(float)(accel*Math.cos(orient));
+                p[1].y+=(float)(accel*Math.sin(orient));
+
+            }
+
+
+        }
+
     }
 
     private void addParticle(){
@@ -107,8 +135,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         total=(Math.round(total*100))/100f;
         float avg=total/ptcls.size();
+        redScale=avg*2;
         avg=(Math.round(avg*100)/100f);
-        return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg+", gravity = "+gravOn;
+        return "Total Kinetic = "+total+", "+ptcls.size()+" particles, avg energy = "+avg;
 
     }
 
@@ -214,6 +243,10 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             changeSpeed(.9f);
         }else if (e.getKeyCode()==KeyEvent.VK_UP){
             changeSpeed(1.1f);
+        }else if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+            intermolecularConstant+=1f;
+        }else if (e.getKeyCode()==KeyEvent.VK_LEFT){
+            intermolecularConstant-=1f;
         }else {
             addParticle();
         }
