@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Main extends Applet implements Runnable, KeyListener {
 
-    private final int sWIDTH=1600, sHEIGHT=1000;
+    private final int sWIDTH=2200, sHEIGHT=1400;
     int ppt=4;
     private final int WIDTH=sWIDTH/ppt, HEIGHT=sHEIGHT/ppt;
     private Thread thread;
@@ -21,6 +21,8 @@ public class Main extends Applet implements Runnable, KeyListener {
     ArrayList<Float> ranges;
     int scale=2;
     ArrayList<int[]> vects=new ArrayList<>();
+
+    boolean[][] bm;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -108,14 +110,10 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void createThreshhold(){
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
-                if (map[x][y]<ranges.get(ranges.size()/3)){
-                    map[x][y]=.25f;
-                    map[x][y]=.01f;
-                }else if (map[x][y]<ranges.get(ranges.size()/3*2)){
-                    map[x][y]=.5f;
-                    map[x][y]=.01f;
+                if (map[x][y]<ranges.get(ranges.size()/3*2)){
+                    map[x][y]=0;
                 }else {
-                    map[x][y]=.75f;
+                    map[x][y]=1f;
                     //map[x][y]=.01f;
                 }
             }
@@ -173,27 +171,13 @@ public class Main extends Applet implements Runnable, KeyListener {
         return avg;
     }
 
-    public void scaleUpSides(){
-        float max=(getPercentile(.2, ranges)+getPercentile(.8, ranges))/2f;
-        for (int x=0; x<WIDTH; x++){
-            for (int y=0; y<HEIGHT/10; y++){
-                map[x][HEIGHT-1-y]=((y*map[x][HEIGHT-1-y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
-                map[x][y]=((y*map[x][y])+((HEIGHT/10-y)*max))/(HEIGHT/10);
-            }
-        }
-        for (int x=0; x<WIDTH/10; x++){
-            for (int y=0; y<HEIGHT; y++){
-                map[WIDTH-1-x][y]=((x*map[WIDTH-x-1][y])+((WIDTH/10-x)*max))/(WIDTH/10);
-                map[x][y]=((x*map[x][y])+((WIDTH/10-x)*max))/(WIDTH/10);
-            }
-        }
 
-    }
+
 
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
         if (v[1]==v[3]||v[0]==v[2]){return;}
-        float period=(float)(5*(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28));
+        float period=(float)(50*(Math.sqrt(Math.pow(v[0]-v[2], 2)+Math.pow(v[1]-v[3], 2))/6.28));
         System.out.println("period for new vector is "+period);
         vects.add(v);
         float slope=(float) (v[3]-v[1])/(float) (v[2]-v[0]);
@@ -204,7 +188,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             for (int y=0; y<map[0].length; y+=scale){
                 float pb1=y-(pslope*x);
                 float xint=(b-pb1)/(pslope-slope);
-                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28*5)+1;
+                float value=(float)Math.sin(((xint-v[0])/(v[2]-v[0]))*6.28)+1;
                 value/=2;
                 map[x][y] = (map[x][y] * (1 - weight)) + (value * weight);
                 for (int x1=x; x1<x+scale; x1++){
@@ -226,6 +210,12 @@ public class Main extends Applet implements Runnable, KeyListener {
             for (int y=0; y<map[0].length; y++){
                 if (map[x][y]>=0) {
                     gfx.setColor(new Color((int) (map[x][y] * 255), (int) (map[x][y] * 255), (int) (map[x][y] * 255)));
+                    if(bm!=null){
+                        if (!bm[x][y]){
+                            gfx.setColor(new Color(255,0,0));
+                            //gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
+                        }
+                    }
                 }else {
                     gfx.setColor(new Color(255,0,0));
                 }
@@ -234,43 +224,15 @@ public class Main extends Applet implements Runnable, KeyListener {
             }
         }
 
+        /*for (int[] p: far){
+            gfx.setColor(new Color(255,0,0));
+            gfx.fillRect(p[0] * ppt, (p[1] * ppt), ppt, ppt);
+        }*/
+
         /*gfx.setColor(Color.RED);
         for (int i=0; i<vects.size(); i++){
             gfx.drawLine(vects.get(i)[0],vects.get(i)[1],vects.get(i)[2],vects.get(i)[3]);
         }*/
-    }
-
-    public void scaleWithSine(){
-        float period=map.length/2;
-        float b=(2*3.14f)/period;
-        float a=map[0].length/3;
-        float vshift=map[0].length/2;
-        float weight=.2f;
-        for (int x=0; x<map.length; x++){
-
-            float cy=(float)(a*Math.sin(x*b)+vshift);
-            for (int y=0; y<map[0].length; y++){
-                float dy=1-(float)(Math.abs(y-cy))/map[0].length;
-                map[x][y]=((dy*weight)+map[x][y])/(1+weight);
-            }
-        }
-    }
-
-    public void scaleWithBigCos(){
-        float period=map.length;
-        float b=(2*3.14f)/period;
-        float a=-map[0].length/4;
-        float vshift=map[0].length/2;
-        float weight=.2f;
-        for (int x=0; x<map.length; x++){
-
-            float cy=(float)(a*Math.cos(x*b)+vshift);
-            for (int y=0; y<map[0].length; y++){
-
-                float dy=1-(float)(((y<cy)?0:Math.abs(y-cy)))/map[0].length;
-                map[x][y]=((dy*weight)+map[x][y])/(1+weight);
-            }
-        }
     }
 
     public void smooth(){
@@ -285,6 +247,57 @@ public class Main extends Applet implements Runnable, KeyListener {
                 map[x][y]=avg/5f;
             }
         }
+    }
+
+    public void move(){
+        if (bm==null){
+            setMap();
+        }
+        boolean[][] b2=new boolean[bm.length][bm[0].length];
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT; y++){
+                if (bm[x][y]){
+                    b2[x][y]=true;
+                }else {
+                    for (int d=0; d<4;d++){
+                        int x1=x+getXInDir(d);
+                        int y1=y+getYInDir(d);
+                        if (x1>=0&&y1>=0&&y1<HEIGHT&&x1<WIDTH){
+                            if (bm[x1][y1]){
+                                b2[x][y]=true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        bm=b2;
+    }
+
+    public void setMap(){
+        bm=new boolean[map.length][map[0].length];
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT; y++){
+                if (map[x][y]==1){
+                    bm[x][y]=true;
+                }
+            }
+        }
+    }
+
+    public float getPercent(){
+        if (bm==null){return 1;}
+        int num=0;
+        int total=WIDTH*HEIGHT;
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT; y++) {
+                if (!bm[x][y]){
+                    num++;
+                }
+            }
+        }
+        System.out.println(num+"/"+total+"="+((float)num/total));
+        return (float)num/total;
     }
 
 
@@ -332,6 +345,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     }
 
+
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
@@ -346,12 +360,26 @@ public class Main extends Applet implements Runnable, KeyListener {
             ranges=getQuartiles();
             createThreshhold();
         }
-        if (key == KeyEvent.VK_S) {
+
+        if (key==KeyEvent.VK_C){
+            reset();
+            for (int i=0; i<5;i++){
+                addVector();
+            }
+
             ranges=getQuartiles();
-            scaleWithBigCos();
+            createThreshhold();
+
+
         }
+
         if (key == KeyEvent.VK_SPACE) {
             smooth();
+        }
+        if (key == KeyEvent.VK_M) {
+            while (getPercent()>.01f){
+                move();
+            }
         }
 
         if (key == KeyEvent.VK_D) {
@@ -359,12 +387,16 @@ public class Main extends Applet implements Runnable, KeyListener {
             scaleDepths();
         }
         if (key == KeyEvent.VK_R) {
-            vects=new ArrayList<>();
-            vectors=0;
-            for (int x=0; x<WIDTH; x++){
-                for (int y=0; y<HEIGHT; y++){
-                    map[x][y]=0;
-                }
+            reset();
+        }
+    }
+    public void reset(){
+        vects=new ArrayList<>();
+        vectors=0;
+        bm=null;
+        for (int x=0; x<WIDTH; x++){
+            for (int y=0; y<HEIGHT; y++){
+                map[x][y]=0;
             }
         }
     }
