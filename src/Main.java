@@ -21,15 +21,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     boolean gravOn=false;
     //COLORS
     Color background = new Color(255, 255, 255);
-    //Color gridColor = new Color(150, 150, 150);
-    //ArrayList<float[]> clicks = new ArrayList<>();
     float redScale=100;
     float intermolecularConstant=15;
-
-
     ArrayList<Vec2f[]> ptcls=new ArrayList<>();
-
-
     public void init() {//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
@@ -38,14 +32,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx = img.getGraphics();
         thread = new Thread(this);
         thread.start();
-
     }
-
     public void paint(Graphics g) {
         //BACKGROUND
         gfx.setColor(background);//background
         gfx.fillRect(0, 0, WIDTH, HEIGHT);//background size
-
         for (Vec2f[] p: ptcls){
             float e=getEnergyOf(p)/redScale;
             if (e>1){e=1;}
@@ -71,16 +62,11 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         //printEnergy();
     }
 
-
     public void run() {
         for (; ; ) {//CALLS UPDATES AND REFRESHES THE GAME
-
             //UPDATES
-
             repaint();//UPDATES FRAME
-            try {
-                Thread.sleep(15);
-            } //ADDS TIME BETWEEN FRAMES (FPS)
+            try { Thread.sleep(15); } //ADDS TIME BETWEEN FRAMES (FPS)
             catch (InterruptedException e) {
                 e.printStackTrace();
                 System.out.println("GAME FAILED TO RUN");
@@ -101,15 +87,10 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
                 if (dv.x==0){dv.x=.00000001f;}
                 float orient=(float)Math.atan(dv.y/dv.x);// ORIENT FROM A TO B
                 if (dv.x<0){orient+=3.14f;}
-
                 p[1].x+=(float)(accel*Math.cos(orient));
                 p[1].y+=(float)(accel*Math.sin(orient));
-
             }
-
-
         }
-
     }
 
     private void addParticle(){
@@ -253,9 +234,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     }
 
     public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode()==KeyEvent.VK_G){
-            gravOn=!gravOn;
-        }
+        if (e.getKeyCode()==KeyEvent.VK_G){ gravOn=!gravOn; }
     }
 
     public void keyTyped(KeyEvent e) {
