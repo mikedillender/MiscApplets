@@ -239,39 +239,15 @@ public class Main extends Applet implements Runnable, KeyListener {
         return 0;
     }
 
-    public void addPond(){
-        float weight=.5f;
-        ranges=getQuartiles();
-        int cx=WIDTH/2;
-        int cy=HEIGHT/2;
-        for (int x=0;x<WIDTH;x++){
-            int dx=x-cx;
-            for (int y=0; y<HEIGHT; y++){
-                int dy=y-cy;
-                float rad=(float)Math.sqrt((((float)dx*dx)/((float)cx*cx))+(((float)dy*dy)/((float)cy*cy)));
-                if (rad>1){rad=1;}
-                map[x][y]=(map[x][y]+(weight*getPercentile(rad,ranges)))/(1+weight);
-            }
-        }
-    }
+    @Override
+    public void keyTyped(KeyEvent e) { }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
+    public void keyPressed(KeyEvent e) { }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-
-        if (key==KeyEvent.VK_P){
-            addPond();
-        }
         if (key == KeyEvent.VK_V) {
             addVector();
         }
@@ -288,10 +264,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
             ranges=getQuartiles();
             createThreshhold();
-
-
         }
-
         if (key == KeyEvent.VK_M) {
             while (getPercent()>.01f){
                 move();
