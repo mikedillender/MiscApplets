@@ -55,57 +55,12 @@ public class Main extends Applet implements Runnable, KeyListener {
                 }
             } else {
                 done=true;
-
-                //scaleWithParabola();
-                //scaleUpSides();
-                //flatten();
-                //createThreshhold();
-                //System.out.println("30th percentile = ");
             }
         }
         repaint();//UPDATES FRAME
         try{ Thread.sleep(20); } //ADDS TIME BETWEEN FRAMES (FPS)
         catch (InterruptedException e) { e.printStackTrace();System.out.println("GAME FAILED TO RUN"); }//TELLS USER IF GAME CRASHES AND WHY
     } }
-
-    public void flatten(){
-        float[][] map2=new float[map.length][map[0].length];
-        for (int x=0; x<WIDTH; x++){
-            for (int y=0; y<HEIGHT/2; y++){
-                map2[x][y]=(map[x][y*2]+map[x][y*2+1])/2f;
-            }
-        }
-        map=map2;
-    }
-
-    public void scaleWithParabola(){
-        float weight=1f;
-        double a=4.0/map[0].length;
-        double ry=map[0].length/8;
-
-        for (int x=0; x<map.length; x+=scale){
-            int cx=(-map.length/2+x);
-            int cy=(int)(ry*((a*cx)*(a*cx)));
-            //if (cy<0){cy=0;}else if (cy>map[0].length){cy=map[0].length;}
-            //System.out.println("f("+cx+") = "+cy);
-
-            for (int y=0; y<map[0].length; y+=scale){
-                float r=1f-(float)((double)Math.abs(y-cy)/map[0].length);
-                if (r>1){r=1;}else if (r<0){r=0;}
-                if (y>cy){
-                    r=.75f;
-                }
-                map[x][y]=r*(map[x][y]+weight*getPercentile(r, ranges))/(1f+weight);
-                for (int x1=x; x1<x+scale; x1++){
-                    for (int y1=y; y1<y+scale; y1++){
-                        map[x1][y1]=map[x][y];
-                    }
-                }
-
-            }
-        }
-    }
-
 
     public void createThreshhold(){
         for (int x=0; x<map.length; x++){
@@ -152,10 +107,6 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     }
 
-    private void scaleDepths(){
-        scaleWithParabola();
-    }
-
     public float getAvgInRange(float low, float high){
         int numTiles=0;
         float sum=0;
@@ -170,9 +121,6 @@ public class Main extends Applet implements Runnable, KeyListener {
         float avg=sum/(float)numTiles;
         return avg;
     }
-
-
-
 
     public void addVector(){
         int[] v=new int[]{(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT),(int)(Math.random()*WIDTH),(int)(Math.random()*HEIGHT)};
@@ -201,10 +149,6 @@ public class Main extends Applet implements Runnable, KeyListener {
         vectors++;
     }
 
-
-
-
-
     public void drawwater(Graphics gfx){
         for (int x=0; x<map.length; x++){
             for (int y=0; y<map[0].length; y++){
@@ -221,30 +165,6 @@ public class Main extends Applet implements Runnable, KeyListener {
                 }
                 gfx.fillRect(x * ppt, (y * ppt), ppt, ppt);
 
-            }
-        }
-
-        /*for (int[] p: far){
-            gfx.setColor(new Color(255,0,0));
-            gfx.fillRect(p[0] * ppt, (p[1] * ppt), ppt, ppt);
-        }*/
-
-        /*gfx.setColor(Color.RED);
-        for (int i=0; i<vects.size(); i++){
-            gfx.drawLine(vects.get(i)[0],vects.get(i)[1],vects.get(i)[2],vects.get(i)[3]);
-        }*/
-    }
-
-    public void smooth(){
-        for (int x=1; x<WIDTH-1; x++){
-            for (int y=1; y<HEIGHT-1; y++){
-                float avg=map[x][y];
-                for (int d=0; d<4; d++){
-                    int x1=x+getXInDir(d);
-                    int y1=y+getYInDir(d);
-                    avg+=map[x1][y1];
-                }
-                map[x][y]=avg/5f;
             }
         }
     }
@@ -337,7 +257,6 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -373,18 +292,10 @@ public class Main extends Applet implements Runnable, KeyListener {
 
         }
 
-        if (key == KeyEvent.VK_SPACE) {
-            smooth();
-        }
         if (key == KeyEvent.VK_M) {
             while (getPercent()>.01f){
                 move();
             }
-        }
-
-        if (key == KeyEvent.VK_D) {
-            ranges=getQuartiles();
-            scaleDepths();
         }
         if (key == KeyEvent.VK_R) {
             reset();
