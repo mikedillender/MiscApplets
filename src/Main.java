@@ -14,7 +14,26 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     int size=(int)(Math.floor(WIDTH/width));
 
     int sizeindex=4;
-    int[] sizes=new int[]{2,4,8,12,16,20,24};
+    int[] sizes=new int[]{2,4,8,12,16,20,22,24,26,28,30,32};
+    boolean[] sizeBinary;
+    boolean[] sizeLines;
+    float randomization=.05f;
+
+    public void setRules(){
+        sizeBinary=new boolean[sizes.length];
+        for (int i=0; i<sizes.length; i++) {
+            if (i < 3 || i == 4) {
+                sizeBinary[i] = true;
+            }
+        }
+        sizeLines=new boolean[sizes.length];
+        for (int i=0; i<sizes.length; i++){
+            if (i<5){
+                //sizeLines[i];
+                //sizeBinary[i]=true;
+            }
+        }
+    }
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -46,7 +65,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     }
 
 
-    public void create(boolean random,boolean symm){
+    public void create(boolean random,boolean symm, boolean lines){
+        if (lines){makeLineMatrix();return;}
         while (!make(random,symm)){}
     }
 
@@ -54,6 +74,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
         this.addMouseListener(this);
+        setRules();
         //make(false,false);
         //create(true);
         img=createImage(WIDTH,HEIGHT);
@@ -85,19 +106,6 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         return row;
     }
     public boolean[] getSymRowID(int id, int rn){
-        /*int r=id;
-        boolean[] row=new boolean[m.length];
-        for (int i=row.length-1; i>=0; i--){
-            int pow=(int)(Math.pow(2,i-rn));
-            //System.out.println("int id "+id+" y="+(width-1-i)+" i="+i+" pow = "+pow+" r="+r);
-            row[width-1-i]=r>=pow;
-            if (row[width-1-i]){
-                r-=pow;
-            }
-        }
-        for (int x=0; x<rn; x++){
-            row[x]=m[x][rn];
-        }*/
         int r=id;
         boolean[] row=new boolean[m.length];
         for (int i=row.length-1; i>=0; i--){
@@ -114,7 +122,112 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         return row;
     }
 
+    private void addLines(){
+        for (int i=0; i<width*2-1; i++){
+            addLine(i,Math.random()<.5);
+        }
+    }
 
+    private void makeLineMatrix(){
+        int allIDs=(int)(Math.pow(2,(width*2-1)));
+        //int startID=(int)(Math.random()*allIDs);
+        //int id=startID;
+        int id=0;
+        //boolean first=true;
+        /*
+        while (!isCorrect()&&(((startID>=id)&&!first)||(first))){
+            addLinesID(id, width*2-1);
+            if (id%1000000==0){
+                System.out.println(id+"/"+allIDs+" = "+(100*(id/(float)allIDs))+" %");
+            }
+            id++;
+            if (id>=allIDs&&first){
+                first=false;
+                id=0;
+            }
+        }*/
+        while (!isCorrect()){
+            smartLines();
+            id++;
+            if (id%1000000==0){
+                System.out.println(id+"/"+allIDs+" = "+(100*(id/(float)allIDs))+" %");
+            }
+        }
+    }
+
+    private void smartLines(){
+        int tr=0;
+        int f=1;
+        int mt=width/2;
+        for (int i=0; i<=width; i++){
+            if (tr<=mt){
+                if (Math.random()<.5||f>=mt){
+                    tr++;
+                    addLine(i,true);
+                }else {
+                    addLine(i,false);
+                }
+            }else {
+                addLine(i,false);
+            }
+        }
+        tr=0;
+        f=1;
+        for (int i=width; i<width*2-1; i++){
+            if (tr<=mt){
+                if (Math.random()<.5||f>=mt){
+                    tr++;
+                    addLine(i,true);
+                }else {
+                    addLine(i,false);
+                }
+            }else {
+                addLine(i,false);
+            }
+        }
+
+    }
+
+    private void addLinesID(int id, int tl){
+        int r=id;
+        //boolean[] row=new boolean[tl];
+        for (int i=tl-1; i>=0; i--){
+            int pow=(int)(Math.pow(2,i));
+            //System.out.println("int id "+id+" y="+(width-1-i)+" i="+i+" pow = "+pow+" r="+r);
+            addLine(i,r>=pow);
+            if (r>=pow){
+                r-=pow;
+            }
+        }
+    }
+
+    private boolean isCorrect(){
+        boolean works=true;
+        for (int i=0; i<width; i++){
+            if (!checkRow(i)){
+                works=false;
+            }
+        }
+        return works;
+    }
+
+    private void addLine(int p,boolean tru){
+        int sx=0,sy=0;
+        if (p<=width){
+            sx=0;
+            sy=p;
+        }else {
+            sx=p-width;
+            sy=0;
+        }
+        sx++;
+        sy++;
+        while (sx<width&&sy<width){
+            m[sx][sy]=tru;
+            sx++;
+            sy++;
+        }
+    }
 
     public boolean checkRow(int i){
         boolean works = true;
@@ -203,7 +316,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         gfx.setColor(background);//background
         gfx.fillRect(0,0,WIDTH,HEIGHT);//background size
 
-
+        gfx.setFont(gfx.getFont().deriveFont(30f));
         gfx.setColor(Color.BLACK);
 
         //RENDER FOREGROUND
@@ -227,6 +340,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         paintCoordGrid(gfx,size);
 
+        gfx.setColor(Color.RED);
+        gfx.drawString("Difficulty = "+randomization,50,50);
         //FINAL
         g.drawImage(img,0,0,this);
     }
@@ -263,18 +378,66 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
     }
 
+    public void createRandom(){
+        double dice=Math.random();
+        ArrayList<Integer> pg=new ArrayList<>();
+        pg.add(0);
+        float[] c=new float[3];
+        c[0]=.5f;
+        if (sizeLines[sizeindex]){
+            pg.add(1);
+            c[1]=.25f;
+        }
+        if (sizeBinary[sizeindex]){
+            pg.add(2);
+            c[2]=.25f;
+        }
+        float d1=(float)(Math.random()*(c[0]+c[1]+c[2]));
+        System.out.println("dice "+d1);
+        if (d1<c[0]){
+            System.out.println("making random");
+            create(true,false,false);
+        }else if (c[1]!=0&&d1<c[1]+c[0]){
+            System.out.println("making lines");
+            create(false,false,true);
+        }else {
+            System.out.println("doing standard");
+            create(false,false,false);
+        }
+
+    }
+
     //INPUT
     public void keyPressed(KeyEvent e) {
-        System.out.println("pressed "+e.getKeyCode());
-        if (e.getKeyCode()==KeyEvent.VK_M) {
-            create(false,false);
+        //System.out.println("pressed "+e.getKeyCode());
+        if (e.getKeyCode()==KeyEvent.VK_SPACE){
+            createRandom();
+        }else if (e.getKeyCode()==KeyEvent.VK_R){
+            randomize(randomization);
+        }else if (e.getKeyCode()==KeyEvent.VK_UP){
+            if (randomization+.1f<1){
+                randomization+=.01f;
+            }
+        }else if (e.getKeyCode()==KeyEvent.VK_DOWN){
+            if (randomization-.01f>=0){
+                randomization-=.01f;
+            }
+        }
+        /*if (e.getKeyCode()==KeyEvent.VK_M) {
+            create(false,false,false);
         }
         if (e.getKeyCode()==KeyEvent.VK_N) {
-           create(true,false);
+           create(true,false,false);
         }
         if (e.getKeyCode()==KeyEvent.VK_S) {
             make(false,true);
         }
+        if (e.getKeyCode()==KeyEvent.VK_L) {
+            addLines();
+        }
+        if (e.getKeyCode()==KeyEvent.VK_O) {
+            makeLineMatrix();
+        }*/
         if (e.getKeyCode()==KeyEvent.VK_RIGHT) {
             if (sizeindex+1<sizes.length) {
                 sizeindex++;
@@ -294,6 +457,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             }
 
         }
+        randomization=(float)(Math.round(randomization*100)/100f);
         if (e.getKeyCode()<=57&&e.getKeyCode()>=48){
             float p=(e.getKeyCode()-48f)/10f;
             if (p==0){
