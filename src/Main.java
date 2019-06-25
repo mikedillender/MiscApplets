@@ -14,7 +14,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     int size=(int)(Math.floor(WIDTH/width));
 
     int sizeindex=4;
-    int[] sizes=new int[]{2,4,8,12,16,20,22,24,26,28,30,32};
+    int[] sizes=new int[]{2,4,8,12,16,20,22,24};
     boolean[] sizeBinary;
     boolean[] sizeLines;
     float randomization=.05f;

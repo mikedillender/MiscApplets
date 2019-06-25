@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-    </list>
+    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,12 +13,12 @@
     <session id="-36692786">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="5547" />
+          <entry key="java" value="5575" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="5547" />
+          <entry key="JAVA" value="5575" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -38,8 +35,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
-              <caret line="318" column="48" selection-start-line="318" selection-start-column="48" selection-end-line="318" selection-end-column="48" />
+            <state relative-caret-position="394">
+              <caret line="459" column="66" selection-start-line="459" selection-start-column="66" selection-end-line="459" selection-end-column="66" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#10036#10037#0" expanded="true" />
@@ -117,7 +114,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561473045542" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561473810122" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/java.policy.applet" />
   </component>
   <component name="RunDashboard">
@@ -225,8 +222,8 @@
     <entry file="file://$PROJECT_DIR$/src/java/policy/applet.java" />
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="318" column="48" selection-start-line="318" selection-start-column="48" selection-end-line="318" selection-end-column="48" />
+        <state relative-caret-position="394">
+          <caret line="459" column="66" selection-start-line="459" selection-start-column="66" selection-end-line="459" selection-end-column="66" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#10036#10037#0" expanded="true" />
