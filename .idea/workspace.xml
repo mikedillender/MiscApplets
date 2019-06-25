@@ -13,12 +13,12 @@
     <session id="-36692786">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="5575" />
+          <entry key="java" value="5578" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="5575" />
+          <entry key="JAVA" value="5578" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -35,8 +35,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="459" column="66" selection-start-line="459" selection-start-column="66" selection-end-line="459" selection-end-column="66" />
+            <state relative-caret-position="187">
+              <caret line="17" column="25" lean-forward="true" selection-start-line="17" selection-start-column="25" selection-end-line="17" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#10036#10037#0" expanded="true" />
@@ -114,7 +114,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561473810122" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1561474364632" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/java.policy.applet" />
   </component>
   <component name="RunDashboard">
@@ -222,8 +222,8 @@
     <entry file="file://$PROJECT_DIR$/src/java/policy/applet.java" />
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="459" column="66" selection-start-line="459" selection-start-column="66" selection-end-line="459" selection-end-column="66" />
+        <state relative-caret-position="187">
+          <caret line="17" column="25" lean-forward="true" selection-start-line="17" selection-start-column="25" selection-end-line="17" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#10036#10037#0" expanded="true" />
