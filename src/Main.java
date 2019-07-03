@@ -14,7 +14,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     int size=(int)(Math.floor(WIDTH/width));
 
     int sizeindex=4;
-    int[] sizes=new int[]{2,4,8,12,16,20,22,24};
+    int[] sizes=new int[]{2,4,8,12,16,20,22,24,32};
     boolean[] sizeBinary;
     boolean[] sizeLines;
     float randomization=.05f;
@@ -28,11 +28,12 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         sizeLines=new boolean[sizes.length];
         for (int i=0; i<sizes.length; i++){
-            if (i<5){
-                //sizeLines[i];
+            if (i<4){
+                sizeLines[i]=true;
                 //sizeBinary[i]=true;
             }
         }
+        sizeLines[2]=false;
     }
 
     //GRAPHICS OBJECTS
@@ -277,7 +278,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
                 }else if ((rand&&iter%incSize==0&&iter>1000000)){
                     System.out.println(iter+" iterations");
                     double dt=((System.nanoTime()-s)/1000000000.0);
-                    if (dt>4*i){
+                    if (dt>i*2){
                         return false;
                     }
                 }
@@ -404,6 +405,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
             System.out.println("doing standard");
             create(false,false,false);
         }
+        randomize(randomization);
 
     }
 
@@ -423,7 +425,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
                 randomization-=.01f;
             }
         }
-        /*if (e.getKeyCode()==KeyEvent.VK_M) {
+        if (e.getKeyCode()==KeyEvent.VK_M) {
             create(false,false,false);
         }
         if (e.getKeyCode()==KeyEvent.VK_N) {
@@ -437,7 +439,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }
         if (e.getKeyCode()==KeyEvent.VK_O) {
             makeLineMatrix();
-        }*/
+        }
+
         if (e.getKeyCode()==KeyEvent.VK_RIGHT) {
             if (sizeindex+1<sizes.length) {
                 sizeindex++;
