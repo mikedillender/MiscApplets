@@ -1,6 +1,7 @@
 public class Player {
     public float x=0,y=0,z=0, v=.05f;
-    public float fov=3.14149f/6.0f;
+    public float fovx=3.14149f*1.2f;
+    public float fovy=3.14149f*1.2f;
     public float ox=0,oy=0;
     public Player(){
     }

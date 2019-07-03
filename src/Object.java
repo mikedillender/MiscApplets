@@ -23,6 +23,7 @@ public class Object implements Screen{
         this.size=size;
         randomizeColors();
     }
+
     public void render(Graphics g, Player p){
         g.setColor(c1);
         int[][] faces=new int[][]{
@@ -67,8 +68,8 @@ public class Object implements Screen{
             float ox=(float)Math.atan(dz/dx);
             float oy=(float)Math.atan(dy/dx);
 
-            float x1=(ox/p.fov)*sWIDTH/2+(sWIDTH/2);
-            float y1=(oy/p.fov)*sHEIGHT/2+(sHEIGHT/2);
+            float x1=(ox/p.fovx)*sWIDTH/2+(sWIDTH/2f);
+            float y1=(oy/p.fovy)*sHEIGHT/2+(sHEIGHT/2f);
 
             vproj[i]=new int[]{(int)x1,(int)y1};
             //System.out.println(v.indexOf(pos));
