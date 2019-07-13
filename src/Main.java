@@ -22,12 +22,12 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     Color background=new Color(255, 255, 255);
     Color gridColor=new Color(150, 150,150);
 
-    Vec2d s=new Vec2d(75,HEIGHT/3f);
-    Vec2d e=new Vec2d(1000,700);
+    Vec2d s=new Vec2d(75,HEIGHT*.75f);
+    Vec2d e=new Vec2d(1000,200);
     ArrayList<Vec2d> rope=new ArrayList<>();
     float L=(float)(Math.sqrt((WIDTH*WIDTH)+((HEIGHT*HEIGHT)/4f)))*.8f;
-
-    float sbdy=-50;
+    float amt=0;
+    float sbdy=-20;
 
 
     public void init(){//STARTS THE PROGRAM
@@ -36,6 +36,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         this.addMouseListener(this);
         img=createImage(WIDTH,HEIGHT);
         gfx=img.getGraphics();
+        setRopeStraight();
         thread=new Thread(this);
         thread.start();
     }
@@ -57,9 +58,20 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         paint(g);
     }
 
+
+    int timer=0;
     public void run() { for (;;){//CALLS UPDATES AND REFRESHES THE GAME
 
             //UPDATES
+        timer--;
+        if (timer<0){
+            timer=10;
+            sbdy++;
+            //stretchAndSag(amt);
+            //sbdy+=20;
+            setRope(sbdy);
+            //setRopeLength();
+        }
 
 
             repaint();//UPDATES FRAME
@@ -70,14 +82,14 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     public void paintRope(Graphics g){
         g.setColor(Color.BLACK);
         if (rope.size()==0){
-            g.fillRect((int)s.x,HEIGHT-(int)s.y,5,5);
-            g.fillRect((int)e.x,HEIGHT-(int)e.y,5,5);
+            g.fillRect((int)s.x,(int)s.y,5,5);
+            g.fillRect((int)e.x,(int)e.y,5,5);
         }else {
             for (Vec2d v: rope){
-                g.fillRect((int)v.x,HEIGHT-(int)v.y,5,5);
+                g.fillRect((int)v.x,(int)v.y,5,5);
             }
             for (int i=1; i<rope.size();i++){
-                g.drawLine((int)rope.get(i-1).x,HEIGHT-(int)rope.get(i-1).y,(int)rope.get(i).x,HEIGHT-(int)rope.get(i).y);
+                g.drawLine((int)rope.get(i-1).x,(int)rope.get(i-1).y,(int)rope.get(i).x,(int)rope.get(i).y);
             }
         }
 
@@ -85,35 +97,72 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
 
     public void setRope(float bdy){
+        if (sbdy>=0){
+            bdy=0;
+        }
         rope=new ArrayList<>();
+        //System.out.println("doing "+bdy);
+        float maxdy= (float) Math.abs(e.y-s.y)/2f;
+        if (maxdy<bdy){ System.out.println("too large");return;}
         int numPoints=30;
         float dx= (float) (e.x-s.x)/2f;
-        Vec2d b=new Vec2d(s.x+dx, s.y+bdy);
+        Vec2d b=new Vec2d(s.x+dx, s.y-bdy);
         float dy= (float) (s.y-b.y);
-        rope.add(s);
-        if (bdy<0) {
+
+        //rope.add(s);
+        if (bdy<=0) {
             for (int i = 1; i < numPoints; i++) {
                 float x = (((1 - (i / (float) numPoints)) * dx));
                 float y2 = (1 - ((x * x) / (dx * dx))) * (dy * dy);
-                rope.add(new Vec2d(s.x + dx - x, s.y - (float) (Math.sqrt(Math.abs(y2)))));
+                rope.add(new Vec2d(s.x + dx - x, s.y + (float) (Math.sqrt(Math.abs(y2)))));
             }
             dy = (float) (e.y - b.y);
             for (int i = 0; i < numPoints; i++) {
                 float x = ((((i / (float) numPoints)) * dx));
                 float y2 = (1 - ((x * x) / (dx * dx))) * (dy * dy);
-                rope.add(new Vec2d(s.x + dx + x, e.y - (float) (Math.sqrt(Math.abs(y2)))));
+                rope.add(new Vec2d(s.x + dx + x, e.y + (float) (Math.sqrt(Math.abs(y2)))));
             }
-        }else {
+        }
+
+        /*if (sbdy>0){
+            int attempts=0;
+            float lcsbdy=getCsbdy();
+            while (Math.abs(lcsbdy-sbdy)>1&&attempts<100){
+                average();
+                if (lcsbdy<sbdy){
+                    //stretchAndSag(-1);
+                }else {
+                    //stretchAndSag(1);
+                }
+                lcsbdy=getCsbdy();
+            }
+        }*/
+        //if (sbdy>0){
+
+        //}
+        /*else {
             dx*=2;
             dy= (float) (e.y-s.y);
             numPoints*=2;
             for (int i = 0; i < numPoints; i++) {
                 float x = ((((i / (float) numPoints)) * dx));
                 float y2 = (1 - ((x * x) / (dx * dx))) * (dy * dy);
-                rope.add(new Vec2d(s.x + x, e.y - (float) (Math.sqrt(Math.abs(y2)))));
+                rope.add(new Vec2d(s.x + x, e.y + (float) (Math.sqrt(Math.abs(y2)))));
+            }*/
+
+        //}
+        //rope.add(e);
+        //setRopeStraight();
+        int attempts=0;
+        float lcsbdy=getCsbdy();
+        while (Math.abs(lcsbdy-sbdy)>1&&attempts<100){
+            if (lcsbdy<sbdy){
+                stretchAndSag(-1);
+            }else {
+                stretchAndSag(1);
             }
+            lcsbdy=getCsbdy();
         }
-        rope.add(e);
     }
 
     public void setRopeStraight(){
@@ -122,22 +171,31 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         float dx= (float) (e.x-s.x);
         float dy= (float) (e.y-s.y);
         float m=(dy/dx);
-        rope.add(s);
         for (int i=0; i<numPoints;i++){
             float x=((float)i/numPoints)*dx;
             float y=m*x;
             rope.add(new Vec2d(s.x+x,s.y+y));
         }
-        rope.add(e);
 
 
     }
 
 
-    public void sag(){
-        float amt=5;
+    public float getCsbdy(){
+        if (rope==null){return sbdy;}
+        if (rope.size()==0||rope.size()<5){return sbdy;}
+        int size=rope.size();
+        float y= (float) (s.y-rope.get(size/2).y);
+        return y;
+    }
+
+    public void stretchAndSag(float amt){
+        //float amt=3;
+        float halfsize=rope.size()/2f;
         for (int i=1; i<rope.size()-1; i++){
-            rope.get(i).y-=amt;
+            float dist=(float)(1-Math.pow(Math.abs(i-halfsize)/halfsize,1.4))*amt;
+            //System.out.println("i"+i+" = "+dist);
+            rope.get(i).y+=dist;
         }
     }
 
@@ -176,15 +234,19 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         }else if(e.getKeyCode()==KeyEvent.VK_L){
             System.out.println(getRopeL());
         }else if(e.getKeyCode()==KeyEvent.VK_G){
-            sag();
+            stretchAndSag(amt);
         }else if(e.getKeyCode()==KeyEvent.VK_UP){
             sbdy-=10;
+            amt--;
         }else if(e.getKeyCode()==KeyEvent.VK_DOWN){
             sbdy-=10;
+            amt++;
         }
+        System.out.println("sbdy = "+sbdy+" = "+getCsbdy());
 
-        System.out.println("BDY = "+sbdy+", length = "+getRopeL()+" / "+L);
-        System.out.println("");
+        //System.out.println(amt);
+        //System.out.println("BDY = "+sbdy+", length = "+getRopeL()+" / "+L);
+        //System.out.println("");
     }
     public void keyReleased(KeyEvent e) {
 
@@ -206,8 +268,8 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        this.e=new Vec2d(e.getX(),HEIGHT-e.getY());
-        setRopeLength();
+        //this.e=new Vec2d(e.getX(),e.getY());
+        //setRopeLength();
         //setRope(sbdy);
         //while (Math.abs(getRopeL()-L)>50){
         //    setRope((float) (-HEIGHT+(2*Math.random()*HEIGHT)));
