@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Main extends Applet implements Runnable, KeyListener, MouseListener {
 
     //BASIC VARIABLES
-    private final int WIDTH=1280, HEIGHT=700;
+    private final int WIDTH=1280, HEIGHT=900;
 
     //GRAPHICS OBJECTS
     private Thread thread;
@@ -25,7 +25,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     Vec2d s=new Vec2d(75,HEIGHT/3f);
     Vec2d e=new Vec2d(1000,700);
     ArrayList<Vec2d> rope=new ArrayList<>();
-    float L=(float)(Math.sqrt((WIDTH*WIDTH)+((HEIGHT*HEIGHT)/4f)));
+    float L=(float)(Math.sqrt((WIDTH*WIDTH)+((HEIGHT*HEIGHT)/4f)))*.8f;
 
     float sbdy=-50;
 
@@ -220,9 +220,9 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
         setRope(sbdy);
         float lastL=getRopeL();
         int attempts=0;
-        while (Math.abs(lastL-L)>50&&attempts<100){
+        while (Math.abs(lastL-L)>50&&attempts<1000){
             attempts++;
-            if (sbdy>0&&L>lastL){
+            if (sbdy>0&&L<lastL){
                 average();
             }else if (lastL<L){
                 sbdy-=10;
