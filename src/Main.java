@@ -84,7 +84,10 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (float[] s: smoke){
             float c=.5f+.5f*((1-(s[4]/2f)));
             //System.out.println(c);
-            gfx.setColor(new Color(c,c,c));
+            float rr=(float)((Math.sqrt(c)));
+            float gg=(float)((c));
+            //float bb=(float)(Math.sqrt(c));
+            gfx.setColor(new Color(rr,gg,gg));
             gfx.fillOval((int)s[0],(int)s[1],(int)s[5],(int)s[5]);
         }
         gfx.setColor(Color.BLACK);
