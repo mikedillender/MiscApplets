@@ -22,7 +22,7 @@ public class Main extends Applet implements Runnable, KeyListener, MouseListener
     //COLORS
     Color background = new Color(255, 255, 255);
     float redScale=100;
-    float intermolecularConstant=15;
+    float intermolecularConstant=0;
     ArrayList<Vec2f[]> ptcls=new ArrayList<>();
     public void init() {//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
