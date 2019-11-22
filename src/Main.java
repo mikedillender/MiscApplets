@@ -25,7 +25,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     ArrayList<ArrayList<Node>> ss;
     ArrayList<Color> sc;
     ArrayList<Node>[][] shapes;
-    Color[][] colors;
+    int[][][] colors;
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
@@ -66,7 +66,7 @@ public class Main extends Applet implements Runnable, KeyListener {
                         ys[i] = (int) (sn.pos.y);
                         i++;
                     }
-                    gfx.setColor(colors[x][y]);
+                    gfx.setColor(new Color(colors[x][y][0],colors[x][y][1],colors[x][y][2]));
                    // gfx.setColor(sc.get(ss.indexOf(s)));
                     gfx.fillPolygon(xs, ys, s.size());
                 }
@@ -88,7 +88,7 @@ public class Main extends Applet implements Runnable, KeyListener {
 
     public void createAll(){
         int pw=30;
-        int py=20;
+        int py=(int)(((float)HEIGHT/WIDTH)*pw);
         Node[][] all=new Node[pw][py];
         for (int y=0; y<py; y++){
             boolean out=(y==0||y+1==py);
@@ -103,7 +103,7 @@ public class Main extends Applet implements Runnable, KeyListener {
             }
         }
         shapes=new ArrayList[pw/2][py-1];
-        colors=new Color[pw][py];
+        colors=new int[pw][py][];
         for (int y=0; y<py-2; y++){
             for (int x=(y%2==0)?0:1;x <pw-1; x+=2){
                 ArrayList<Node> s1=new ArrayList<>();
@@ -114,7 +114,7 @@ public class Main extends Applet implements Runnable, KeyListener {
                 s1.add(all[x+1][y+1]);
                 s1.add(all[x+1][y]);
                 shapes[x/2][y]=s1;
-                colors[x/2][y]=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
+                colors[x/2][y]=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
                 //sc.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));
                 ss.add(s1);
                 //for (int x1=0; )
@@ -135,7 +135,19 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void spread(){
         for (int x=0; x<shapes.length; x++){
             for (int y=0; y<shapes[x].length-1; y++){
-                colors[x][y]=colors[x][y+1];
+                if (colors[x][y]!=null&&colors[x][y+1]!=null) {
+                    for (int i = 0; i < 3; i++) {
+                        colors[x][y][i] = (int)((colors[x][y][i] + colors[x][y + 1][i]*.1f) / 1.1f);
+                    }
+                }
+            }
+        }for (int x=0; x<shapes.length-1; x++){
+            for (int y=0; y<shapes[x].length; y++){
+                if (colors[x][y]!=null&&colors[x+1][y]!=null) {
+                    for (int i = 0; i < 3; i++) {
+                        colors[x][y][i] = (int)((colors[x][y][i] + colors[x+1][y][i]*.1f) / 1.1f);
+                    }
+                }
             }
         }
     }
@@ -197,9 +209,10 @@ public class Main extends Applet implements Runnable, KeyListener {
     //INPUT
     public void keyPressed(KeyEvent e) {
         //addShape();
+        spread();
+
     }
     public void keyReleased(KeyEvent e) {
-        spread();
     }
     public void keyTyped(KeyEvent e) { }
 
