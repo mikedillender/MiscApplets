@@ -21,13 +21,18 @@ public class Main extends Applet implements Runnable, KeyListener {
     Color gridColor=new Color(150, 150,150);
     float timer=1;
     ArrayList<Node> n;
+    Node[][] an;
     ArrayList<ArrayList<Node>> ss;
+    ArrayList<Color> sc;
+    ArrayList<Node>[][] shapes;
+    Color[][] colors;
     public void init(){//STARTS THE PROGRAM
         this.resize(WIDTH, HEIGHT);
         this.addKeyListener(this);
         img=createImage(WIDTH,HEIGHT);
         n=new ArrayList<>();
         ss=new ArrayList<>();
+        sc=new ArrayList<>();
         gfx=img.getGraphics();
         createAll();
         thread=new Thread(this);
@@ -46,19 +51,29 @@ public class Main extends Applet implements Runnable, KeyListener {
             }
         }*/
         int l1=0;
-        for (ArrayList<Node> s:ss){
-            l1++;
-            int i=0;
-            int[] x=new int[s.size()];
-            int[] y=new int[s.size()];
+        //for (ArrayList<Node> s:ss){
+        for (int x=0; x<shapes.length; x++){
+            for (int y=0; y<shapes[0].length; y++) {
+                ArrayList<Node> s=shapes[x][y];
+                if (s!=null) {
+                    l1++;
+                    int i = 0;
+                    int[] xs = new int[s.size()];
+                    int[] ys = new int[s.size()];
 
-            for (Node sn: s){
-                x[i]=(int)(sn.pos.x);
-                y[i]=(int)(sn.pos.y);
-                i++;
+                    for (Node sn : s) {
+                        xs[i] = (int) (sn.pos.x);
+                        ys[i] = (int) (sn.pos.y);
+                        i++;
+                    }
+                    gfx.setColor(colors[x][y]);
+                   // gfx.setColor(sc.get(ss.indexOf(s)));
+                    gfx.fillPolygon(xs, ys, s.size());
+                }
+                //gfx.setColor(new Color((l1*255/ss.size())/2,(l1*255/ss.size())/2,(l1*255/ss.size())));
+                //gfx.setColor(sc.get(ss.indexOf(s)));
+
             }
-            gfx.setColor(new Color((l1*255/ss.size())/2,(l1*255/ss.size())/2,(l1*255/ss.size())));
-            gfx.fillPolygon(x,y,s.size());
         }
         //RENDER FOREGROUND
 
@@ -72,24 +87,58 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void createAll(){
-        int pw=15;
-        int py=10;
+        int pw=30;
+        int py=20;
+        Node[][] all=new Node[pw][py];
         for (int y=0; y<py; y++){
             boolean out=(y==0||y+1==py);
             for (int x=0;x <pw; x++){
-                boolean out1= (out) ||( x == 0 )||( x + 1 == pw);
+                //boolean out1= (out) ||( x == 0 )||( x + 1 == pw)||(x==1&&y%2==0)||(y==1&&x%2==0)||(y==py-2&&x%2==1)||(x==pw-2&&y%2==0);
+                boolean out1= (out) ||( x == 0 )||( x + 1 == pw)||x==1||x==pw-2||y==1||y==py-2;
                 System.out.println("x = "+x+", y = "+y+" | out = "+out);
-                Node nw=new Node(new Vec2f(x*((float)(WIDTH+100f)/(pw-1))-50,y*((float)(HEIGHT+100f)/(py-1))-50),new Vec2f((float)(Math.random()*14-7),(float)(Math.random()*14-7)),out1);
-                nw.connectClosest(2,n);
+                Node nw=new Node(new Vec2f(x*((float)(WIDTH+100f)/(pw-1))-50+((int)(Math.random()*30)-15),y*((float)(HEIGHT+100f)/(py-1))-50+((int)(Math.random()*30)-15)),new Vec2f((float)(Math.random()*4-2),(float)(Math.random()*4-2)),out1);
+                //nw.connectClosest(2,n);
+                all[x][y]=nw;
                 n.add(nw);
             }
         }
-        for (Node n1:n){
-            ss.add(findShape(n1));
-
+        shapes=new ArrayList[pw/2][py-1];
+        colors=new Color[pw][py];
+        for (int y=0; y<py-2; y++){
+            for (int x=(y%2==0)?0:1;x <pw-1; x+=2){
+                ArrayList<Node> s1=new ArrayList<>();
+                s1.add(all[x][y]);
+                s1.add(all[x][y+1]);
+                s1.add(all[x][y+2]);
+                s1.add(all[x+1][y+2]);
+                s1.add(all[x+1][y+1]);
+                s1.add(all[x+1][y]);
+                shapes[x/2][y]=s1;
+                colors[x/2][y]=new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
+                //sc.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));
+                ss.add(s1);
+                //for (int x1=0; )
+            }
+        }
+        for (ArrayList<Node> s:ss){
+            for (Node n : s){
+                for (Node n1 : s){
+                    n.connectTo(n1);
+                }
+            }
+        }
+        an=all;
+        //for (Node n1:n){
+        //    ss.add(findShape(n1));
+        //}
+    }
+    public void spread(){
+        for (int x=0; x<shapes.length; x++){
+            for (int y=0; y<shapes[x].length-1; y++){
+                colors[x][y]=colors[x][y+1];
+            }
         }
     }
-
     public ArrayList<Node> findShape(Node n){
         //ArrayList<A>
         ArrayList<Node> s=new ArrayList<>();
@@ -150,7 +199,7 @@ public class Main extends Applet implements Runnable, KeyListener {
         //addShape();
     }
     public void keyReleased(KeyEvent e) {
-
+        spread();
     }
     public void keyTyped(KeyEvent e) { }
 
