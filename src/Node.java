@@ -21,8 +21,8 @@ public class Node {
         pos.y+=vel.y*delta;
         for (Node n:connected){
             //float di=n.distTo(this);
-            vel.x+=(delta*(n.pos.x-this.pos.x)/20);
-            vel.y+=(delta*(n.pos.y-this.pos.y)/20);
+            vel.x+=(delta*(n.pos.x-this.pos.x)/4);
+            vel.y+=(delta*(n.pos.y-this.pos.y)/4);
         }
     }
     public void connectClosest(int num, ArrayList<Node> nodes){

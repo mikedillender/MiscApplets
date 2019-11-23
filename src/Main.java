@@ -87,16 +87,17 @@ public class Main extends Applet implements Runnable, KeyListener {
     }
 
     public void createAll(){
-        int pw=30;
+        int pw=25;
         int py=(int)(((float)HEIGHT/WIDTH)*pw);
         Node[][] all=new Node[pw][py];
+        int posVar=(int)((float)WIDTH/pw/2f);
         for (int y=0; y<py; y++){
             boolean out=(y==0||y+1==py);
             for (int x=0;x <pw; x++){
                 //boolean out1= (out) ||( x == 0 )||( x + 1 == pw)||(x==1&&y%2==0)||(y==1&&x%2==0)||(y==py-2&&x%2==1)||(x==pw-2&&y%2==0);
                 boolean out1= (out) ||( x == 0 )||( x + 1 == pw)||x==1||x==pw-2||y==1||y==py-2;
                 System.out.println("x = "+x+", y = "+y+" | out = "+out);
-                Node nw=new Node(new Vec2f(x*((float)(WIDTH+100f)/(pw-1))-50+((int)(Math.random()*30)-15),y*((float)(HEIGHT+100f)/(py-1))-50+((int)(Math.random()*30)-15)),new Vec2f((float)(Math.random()*4-2),(float)(Math.random()*4-2)),out1);
+                Node nw=new Node(new Vec2f(x*((float)(WIDTH+100f)/(pw-1))-50+((int)(Math.random()*posVar)-posVar/2f),y*((float)(HEIGHT+100f)/(py-1))-50+((int)(Math.random()*posVar)-posVar/2f)),new Vec2f((float)(Math.random()*4-2),(float)(Math.random()*4-2)),out1);
                 //nw.connectClosest(2,n);
                 all[x][y]=nw;
                 n.add(nw);
@@ -114,8 +115,9 @@ public class Main extends Applet implements Runnable, KeyListener {
                 s1.add(all[x+1][y+1]);
                 s1.add(all[x+1][y]);
                 shapes[x/2][y]=s1;
-                int rg=(int)(Math.random()*200);
-                int b=(int)(rg+((255-rg)*Math.random()));
+                int rg=(int)(Math.random()*75)+100;
+                rg=(int)(rg*Math.sqrt(1-((float)y/(py-2))));
+                int b=(int)(rg+20+((255-rg-20)*Math.random()));
                 //colors[x/2][y]=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
                 colors[x/2][y]=new int[]{rg,rg,b};
                 //sc.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));

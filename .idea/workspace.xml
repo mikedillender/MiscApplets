@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="it actually works!">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LearningApplet/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LearningApplet/Main.class" afterDir="false" />
+    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="made spreading more efficient">
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Node.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,14 +16,14 @@
     <session id="-36692786">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="3617" />
-          <entry key="txt" value="86" />
+          <entry key="java" value="3802" />
+          <entry key="txt" value="115" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="3617" />
-          <entry key="PLAIN_TEXT" value="86" />
+          <entry key="JAVA" value="3802" />
+          <entry key="PLAIN_TEXT" value="115" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -39,7 +38,7 @@
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
@@ -51,8 +50,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="151" column="85" selection-start-line="151" selection-start-column="85" selection-end-line="151" selection-end-column="85" />
+            <state relative-caret-position="298">
+              <caret line="89" column="17" selection-start-line="89" selection-start-column="17" selection-end-line="89" selection-end-column="17" />
               <folding>
                 <element signature="e#2454#2455#0" expanded="true" />
                 <element signature="e#2494#2495#0" expanded="true" />
@@ -68,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Node.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="10" column="20" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
+            <state relative-caret-position="306">
+              <caret line="24" column="48" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1282#1283#0" expanded="true" />
@@ -91,6 +90,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>paint</find>
+      <find>color</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -137,7 +137,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1574443629334" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1574531584801" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/java.policy.applet" />
   </component>
   <component name="RunDashboard">
@@ -216,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1574452841953</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="made spreading more efficient">
+      <created>1574529775969</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1574529775969</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -232,7 +239,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32938388" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32938388" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997879" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -259,7 +266,8 @@
     <MESSAGE value="I mean its kinda cool, but not exactly what I wanted" />
     <MESSAGE value="hexagonal" />
     <MESSAGE value="it actually works!" />
-    <option name="LAST_COMMIT_MESSAGE" value="it actually works!" />
+    <MESSAGE value="made spreading more efficient" />
+    <option name="LAST_COMMIT_MESSAGE" value="made spreading more efficient" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Character.java" />
@@ -269,8 +277,8 @@
     <entry file="file://$PROJECT_DIR$/src/java/policy/applet.java" />
     <entry file="file://$PROJECT_DIR$/src/Node.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="10" column="20" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
+        <state relative-caret-position="306">
+          <caret line="24" column="48" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1282#1283#0" expanded="true" />
@@ -281,8 +289,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="151" column="85" selection-start-line="151" selection-start-column="85" selection-end-line="151" selection-end-column="85" />
+        <state relative-caret-position="298">
+          <caret line="89" column="17" selection-start-line="89" selection-start-column="17" selection-end-line="89" selection-end-column="17" />
           <folding>
             <element signature="e#2454#2455#0" expanded="true" />
             <element signature="e#2494#2495#0" expanded="true" />
