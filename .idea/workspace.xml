@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="I mean its kinda cool, but not exactly what I wanted">
+    <list default="true" id="0dbfaa83-fe32-4e0d-96ca-271218c50a25" name="Default" comment="it actually works!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LearningApplet/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/LearningApplet/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LearningApplet/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -17,14 +17,14 @@
     <session id="-36692786">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="3074" />
-          <entry key="txt" value="56" />
+          <entry key="java" value="3617" />
+          <entry key="txt" value="86" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="3074" />
-          <entry key="PLAIN_TEXT" value="56" />
+          <entry key="JAVA" value="3617" />
+          <entry key="PLAIN_TEXT" value="86" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -51,11 +51,15 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="64" column="26" selection-start-line="64" selection-start-column="26" selection-end-line="64" selection-end-column="26" />
+            <state relative-caret-position="204">
+              <caret line="151" column="85" selection-start-line="151" selection-start-column="85" selection-end-line="151" selection-end-column="85" />
               <folding>
                 <element signature="e#2454#2455#0" expanded="true" />
                 <element signature="e#2494#2495#0" expanded="true" />
+                <element signature="e#4792#4793#0" expanded="true" />
+                <element signature="e#4816#4817#0" expanded="true" />
+                <element signature="e#4867#4868#0" expanded="true" />
+                <element signature="e#4914#4915#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -198,7 +202,21 @@
       <option name="project" value="LOCAL" />
       <updated>1574441466659</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="hexagonal">
+      <created>1574448211512</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1574448211512</updated>
+    </task>
+    <task id="LOCAL-00003" summary="it actually works!">
+      <created>1574452841953</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1574452841953</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -214,7 +232,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32938388" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32938388" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997879" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -239,7 +257,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="I mean its kinda cool, but not exactly what I wanted" />
-    <option name="LAST_COMMIT_MESSAGE" value="I mean its kinda cool, but not exactly what I wanted" />
+    <MESSAGE value="hexagonal" />
+    <MESSAGE value="it actually works!" />
+    <option name="LAST_COMMIT_MESSAGE" value="it actually works!" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Character.java" />
@@ -261,11 +281,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="64" column="26" selection-start-line="64" selection-start-column="26" selection-end-line="64" selection-end-column="26" />
+        <state relative-caret-position="204">
+          <caret line="151" column="85" selection-start-line="151" selection-start-column="85" selection-end-line="151" selection-end-column="85" />
           <folding>
             <element signature="e#2454#2455#0" expanded="true" />
             <element signature="e#2494#2495#0" expanded="true" />
+            <element signature="e#4792#4793#0" expanded="true" />
+            <element signature="e#4816#4817#0" expanded="true" />
+            <element signature="e#4867#4868#0" expanded="true" />
+            <element signature="e#4914#4915#0" expanded="true" />
           </folding>
         </state>
       </provider>

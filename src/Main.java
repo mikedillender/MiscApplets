@@ -114,7 +114,10 @@ public class Main extends Applet implements Runnable, KeyListener {
                 s1.add(all[x+1][y+1]);
                 s1.add(all[x+1][y]);
                 shapes[x/2][y]=s1;
-                colors[x/2][y]=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
+                int rg=(int)(Math.random()*200);
+                int b=(int)(rg+((255-rg)*Math.random()));
+                //colors[x/2][y]=new int[]{(int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)};
+                colors[x/2][y]=new int[]{rg,rg,b};
                 //sc.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));
                 ss.add(s1);
                 //for (int x1=0; )
@@ -132,25 +135,30 @@ public class Main extends Applet implements Runnable, KeyListener {
         //    ss.add(findShape(n1));
         //}
     }
+    public int getXinDir(int d){
+        return (d%2==0)?0:((d==1)?1:-1);
+    }
+    public int getYinDir(int d){
+        return (d%2==1)?0:((d==0)?1:-1);
+    }
     public void spread(){
         for (int x=0; x<shapes.length; x++){
             for (int y=0; y<shapes[x].length-1; y++){
-                if (colors[x][y]!=null&&colors[x][y+1]!=null) {
-                    for (int i = 0; i < 3; i++) {
-                        colors[x][y][i] = (int)((colors[x][y][i] + colors[x][y + 1][i]*.1f) / 1.1f);
-                    }
-                }
-            }
-        }for (int x=0; x<shapes.length-1; x++){
-            for (int y=0; y<shapes[x].length; y++){
-                if (colors[x][y]!=null&&colors[x+1][y]!=null) {
-                    for (int i = 0; i < 3; i++) {
-                        colors[x][y][i] = (int)((colors[x][y][i] + colors[x+1][y][i]*.1f) / 1.1f);
+                for (int d=0; d<4; d++) {
+                    int x1=getXinDir(d);
+                    int y1=getYinDir(d);
+                    if (!(x1<0 || y1<0 || x1>=shapes.length||y1>=shapes[x].length)) {
+                        if (colors[x][y] != null && colors[x1][y1] != null) {
+                            for (int i = 0; i < 3; i++) {
+                                colors[x][y][i] = (int) ((colors[x][y][i] + colors[x1][y1][i] * .1f) / 1.1f);
+                            }
+                        }
                     }
                 }
             }
         }
     }
+
     public ArrayList<Node> findShape(Node n){
         //ArrayList<A>
         ArrayList<Node> s=new ArrayList<>();
