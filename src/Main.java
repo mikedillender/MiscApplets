@@ -23,7 +23,7 @@ public class Main extends Applet implements Runnable, KeyListener {
     public void createVecs(int num){
         vecs=new float[num][4];
         for (int i=0; i<num*4; i++){
-            vecs[i/4][i%4]=(float)(Math.random()*10-5);
+            vecs[i/4][i%4]=(float)(Math.random()*6-3);
         }
     }
 
@@ -48,7 +48,9 @@ public class Main extends Applet implements Runnable, KeyListener {
         for (int x=0; x<WIDTH/ts; x++){
             for (int y=0; y<HEIGHT/ts; y++) {
                 int v=getTile(x+px,y+py);
-                gfx.setColor(new Color((v/(255*255)),(v/255)%255,v%255));
+                //v=(v>130)?0:250;
+                //gfx.setColor(new Color((v/(255*255)),(v/255)%255,v%255));
+                gfx.setColor(new Color(v,v,v));
                 gfx.fillRect(ts*x,ts*y,ts,ts);
             }
         }
@@ -83,8 +85,16 @@ public class Main extends Applet implements Runnable, KeyListener {
         }if (e.getKeyCode()==KeyEvent.VK_RIGHT){
             px++;
         }
-        if (e.getKeyCode()==KeyEvent.VK_SPACE){
+        if (e.getKeyCode()==KeyEvent.VK_1){
             createVecs(1);
+        }if (e.getKeyCode()==KeyEvent.VK_2){
+            createVecs(2);
+        }if (e.getKeyCode()==KeyEvent.VK_3){
+            createVecs(3);
+        }if (e.getKeyCode()==KeyEvent.VK_4){
+            createVecs(4);
+        }if (e.getKeyCode()==KeyEvent.VK_8){
+            createVecs(8);
         }
     }
 
@@ -100,7 +110,8 @@ public class Main extends Applet implements Runnable, KeyListener {
         }
         sum/=vecs.length;
 
-        return (int)(sum/2f*255*255*255);
+        //return (int)(sum/2f*255*255*255);
+        return (int)(sum/2f*255);
     }
 
     //QUICK METHOD I MADE TO DISPLAY A COORDINATE GRID
